@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {{!--
+    <link rel="shortcut icon" href="/ui/static/favicon.ico" /> --}}
+    <title>
+        {{#if errorTitle}}{{errorTitle}} :: {{/if}}EpicSevenDB.com API ({{#if VERSION}}v{{VERSION}}{{/if}})
+    </title>
+    <link rel="stylesheet" href="/ui/css/Application.css" />
+</head>
+
+<body>
+    <div class="footer-sibling">
+        <header class="section">
+            <div class="container">
+                <h1 class="title">
+                    EpicSevenDB.com API
+                </h1>
+                <h2 class="subtitle">
+                    API Documentation
+                </h2>
+                {{!-- .field.is-grouped>.control*2>.tags.has-addons>span.tag.is-dark+span.tag.is-info --}}
+                <div class="field is-grouped">
+                    <div class="control">
+                        <div class="tags has-addons">
+                            <span class="tag is-dark">version</span>
+                            <span class="tag is-info">{{VERSION}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        {{{body}}}
+
+    </div>
+
+    {{!-- footer.footer.has-background-dark.has-font-light>.content.has-text-centered --}}
+    <footer class="footer has-background-dark has-text-light">
+        <div class="content has-text-centered">
+            <p>
+                <a href="https://EpicSevenDB.com">EpicSevenDB.com</a> ||
+                <a href="https://RaphaelDDL.com">RaphaelDDL.com</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/ui/js/Application.js" type="text/javascript"></script>
+</body>
+
+</html>

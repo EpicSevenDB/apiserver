@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+//Lato font, Regular and Heavy
+@import url('https://fonts.googleapis.com/css?family=Lato:400,900');
+
+//bulma.io
+@import 'framework';
+
+//Application
+
+//footer always on bottom
+body {
+	display: flex;
+	min-height: calc(100vh);
+	flex-direction: column;
+
+	.footer-sibling {
+		flex: 1 0 auto;
+	}
+}

@@ -1,0 +1,25 @@
+<section class="section error-page">
+    <div class="container content">
+        <h3 class="title is-4 has-text-danger">
+            {{errorTitle}}
+        </h3>
+        <p>
+            If you believe you are correctly following the API instructions but this page was presented, please open an <a href="https://github.com/EpicSevenDB/apiserver/issues" target="_blank"><strong class="has-text-info">Issue on Github</strong></a>.
+        </p>
+        <p>
+            If an error stack is present below, please send a screenshot of it as part of your issue, in order for us to investigate.
+        </p>
+
+        {{#if errorStack}}
+        <div class="message is-danger">
+            <pre class="message-body">{{errorStack}}</pre>
+        </div>
+        {{/if}}
+
+        <p>
+            <a href="/" class="button is-link">
+                &lt; Return to API Homepage
+            </a>
+        </p>
+    </div>
+</section>

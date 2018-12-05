@@ -1,0 +1,109 @@
+{
+	"name": "epicsevendb-apiserver",
+	"version": "0.0.1",
+	"description": "EpicSevenDB.com API Server",
+	"main": "dist/server/Application.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"init": "rm -rf ./dist/* & rm -rf ./node_modules/*; npm install",
+		"start": "node dist/server/Application.js",
+		"clean:dist": "rimraf ./dist/*",
+		"prebuild": "run-s codestandard clean:dist",
+		"build:server": "babel --extends=src/server/.babelrc src/server -d dist/server",
+		"build:js": "babel --extends=src/ui/.babelrc src/ui -d dist/ui",
+		"build:css": "npm run sass",
+		"build:static": "mkdir -p dist/ui/static && cp -rf src/ui/static dist/ui/",
+		"build": "run-p build:*",
+		"precommit": "pretty-quick --staged",
+		"prettier": "prettier-eslint --write \"src/**/*.js\"",
+		"lint": "eslint \"src/**/*.js\" --fix",
+		"codestandard": "run-s prettier lint",
+		"sass": "node-sass --output-style compressed src/ui/css/ -o dist/ui/css/ --importer node_modules/node-sass-import",
+		"dev": "run-p dev:sass dev:ui build:static & run-s dev:server",
+		"dev:sass": "node-sass --output-style expanded -w src/ui/css/ -o dist/ui/css/ --importer node_modules/node-sass-import",
+		"dev:ui": "babel --extends=src/ui/.babelrc src/ui --watch -d dist/ui",
+		"dev:server": "nodemon --inspect src/server/Application.js --exec babel-node --extends=src/server/.babelrc"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/EpicSevenDB/apiserver.git"
+	},
+	"author": "RaphaelDDL",
+	"license": "AGPL-3.0-only",
+	"bugs": {
+		"url": "https://github.com/EpicSevenDB/apiserver/issues"
+	},
+	"homepage": "https://github.com/EpicSevenDB/apiserver#readme",
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"dateformat": "^3.0.3",
+		"dep-linker": "^1.0.24",
+		"express": "^4.16.3",
+		"express-device": "^0.4.2",
+		"express-rate-limit": "^3.1.0",
+		"hbs": "^4.0.1",
+		"helmet": "^3.13.0",
+		"mongodb": "^3.1.1",
+		"npm-run-all": "^4.1.3"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.0.0-beta.54",
+		"@babel/core": "^7.0.0-beta.54",
+		"@babel/node": "^7.0.0-beta.54",
+		"@babel/plugin-transform-runtime": "^7.0.0-rc.1",
+		"@babel/preset-env": "^7.0.0-beta.54",
+		"@babel/register": "^7.0.0-beta.54",
+		"@babel/runtime": "^7.0.0-rc.1",
+		"babel-eslint": "^8.2.6",
+		"babel-preset-minify": "^0.5.0-alpha.3cc09dcf",
+		"bulma": "^0.7.1",
+		"eslint": "^5.1.0",
+		"eslint-config-prettier": "^2.9.0",
+		"eslint-plugin-import": "^2.13.0",
+		"eslint-plugin-prettier": "^2.6.2",
+		"husky": "^0.14.3",
+		"igdb-api-node": "^3.1.7",
+		"node-sass": "^4.9.3",
+		"node-sass-import": "^2.0.1",
+		"nodemon": "^1.18.2",
+		"prettier": "^1.13.7",
+		"prettier-eslint-cli": "^4.7.1",
+		"pretty-quick": "^1.6.0",
+		"request": "^2.88.0",
+		"rimraf": "^2.6.2"
+	},
+	"babel": {
+		"env": {
+			"production": {
+				"presets": [
+					"minify"
+				]
+			}
+		},
+		"plugins": [
+			[
+				"@babel/transform-runtime",
+				{
+					"regenerator": true
+				}
+			]
+		]
+	},
+	"eslintConfig": {
+		"parser": "babel-eslint",
+		"plugins": [
+			"import",
+			"prettier"
+		],
+		"env": {
+			"es6": true,
+			"node": true
+		},
+		"extends": [
+			"plugin:prettier/recommended"
+		],
+		"rules": {
+			"prettier/prettier": "error"
+		}
+	}
+}
