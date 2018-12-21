@@ -1,11 +1,7 @@
 import express from 'express';
 import Database from './Database';
 
-import {
-	asyncRoute,
-	mountApiErrorResponse,
-	mountApiResponse,
-} from '../utils/Utility';
+import { asyncRoute, mountApiErrorResponse, mountApiResponse } from '../utils/Utility';
 import { MESSAGES } from '../utils/Constants';
 
 // const router = RouterExperiments;
@@ -15,21 +11,28 @@ const router = express.Router();
 // Example
 //------------------------ */
 router.get(
-    '/heroes/list',
-    // `:variable`, `:optionalvariable?`
+	'/artifact/list',
+	// `:variable`, `:optionalvariable?`
 	asyncRoute(async (req, res, next) => {
-		const heroesCollection = Database.getCollection('heroes');
+		const collection = Database.getCollection('artifact');
 
-        if (!heroesCollection) {
+		if (!collection) {
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 
 		// req.params.results resource/{number}
 		// req.query.results resource?results={number}
 
-        let queryCursor;
+		let queryCursor;
 
-        // queryCursor = await heroesCollection.somemongomethod
+		// https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/
+		queryCursor = await collection
+			.find()
+			.project({ loreDescription: 0, skillDescription: 0, stats: 0, _id: 0 })
+			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
+			.sort({
+				rarity: -1,
+			});
 
 		return queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
 	})

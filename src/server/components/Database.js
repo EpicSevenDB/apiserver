@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
-import { DB, MESSAGES } from '../utils/Constants';
+import { DB } from '../utils/Constants';
 
+// https://medium.com/@naumanzafarchaudhry/using-mongodb-on-heroku-without-verifying-your-account-9053a8c42e3c
 class Database {
 	constructor() {
 		this.mongoClient = {};
@@ -22,14 +23,11 @@ class Database {
 		return (this.mongoClientDb = db);
 	}
 
-	getCollection(tableName) {
-        if (!isSupportedTable(tableName)) {
-            throw new Error(MESSAGES.db.noTable);
-		}
+	getCollection(collectionName) {
 		if (typeof this.db.collection !== 'function') {
 			return undefined;
 		}
-        return this.db.collection(tableName);
+		return this.db.collection(collectionName);
 	}
 
 	connect() {

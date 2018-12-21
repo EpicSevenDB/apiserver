@@ -7,9 +7,8 @@ export const VERSION = version;
 // Section: Database Related
 //------------------------ */
 export const DB = {
-	url: process.env.MONGO_URI || '',
-	name: process.env.MONGO_DBNAME || '',
-    table: process.env.MONGO_DBTABLE || '',
+	name: 'epicsevendb',
+	url: process.env.MONGOLAB_URI || '',
 };
 
 //* ------------------------

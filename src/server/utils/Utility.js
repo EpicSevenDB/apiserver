@@ -41,11 +41,9 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 		});
 };
 
-
 //* ------------------------
 // Section: Database Related
 //------------------------ */
-
 
 //* ------------------------
 // Section:General Utility Related
