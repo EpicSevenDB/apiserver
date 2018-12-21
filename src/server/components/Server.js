@@ -2,6 +2,7 @@ import express from 'express';
 import device from 'express-device';
 import hbs from 'hbs';
 import helmet from 'helmet';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import paths from '../utils/Paths';
 import { MESSAGES } from '../utils/Constants';
@@ -19,6 +20,8 @@ export default class Server {
 		this.app.use(bodyParser.json());
 		this.app.use(helmet());
 		this.app.use(helmet.permittedCrossDomainPolicies());
+		app.use(cors());
+		app.options('*', cors());
 		this.app.use(
 			helmet.contentSecurityPolicy({
 				directives: {

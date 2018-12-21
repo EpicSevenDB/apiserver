@@ -40,6 +40,7 @@
 	"homepage": "https://github.com/EpicSevenDB/apiserver#readme",
 	"dependencies": {
 		"body-parser": "^1.18.3",
+		"cors": "^2.8.5",
 		"dateformat": "^3.0.3",
 		"dep-linker": "^1.0.24",
 		"express": "^4.16.3",
