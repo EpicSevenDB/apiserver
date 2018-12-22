@@ -8,10 +8,27 @@ import { MESSAGES } from '../utils/Constants';
 const router = express.Router();
 
 //* ------------------------
-// Example
+// Artifacts
 //------------------------ */
 router.get(
-	'/artifact/list',
+	'/artifact/:fileId',
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('artifact'),
+			{ fileId } = req.params;
+
+		if (!collection || !fileId) {
+			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
+		}
+
+		let queryCursor = await collection.findOne({
+			fileId,
+		});
+
+		return queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+	})
+);
+router.get(
+	'/artifact',
 	// `:variable`, `:optionalvariable?`
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('artifact');
