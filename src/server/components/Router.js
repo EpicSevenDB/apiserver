@@ -20,7 +20,7 @@ router.get(
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 
-		let queryCursor = await collection.findOne({
+		let queryCursor = await collection.find({
 			fileId,
 		});
 
