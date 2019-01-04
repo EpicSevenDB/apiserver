@@ -70,13 +70,71 @@ router.get(
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 
+		// let queryCursor = await collection
+		// 	.aggregate([
+		// 		{ $match: { fileId } },
+		// 		{
+		// 			$lookup: {
+		// 				from: 'hero',
+		// 				as: 'relationsFull',
+		// 				localField: 'relations.hero',
+		// 				foreignField: 'fileId',
+		// 			},
+		// 		},
+		// 	]);
+
+		//get hero
 		let queryCursor = await collection
 			.find({
 				fileId,
 			})
+			.project({ _id: 0 })
 			.limit(1);
 
-		return queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+		await queryCursor.toArray().then((currentHero) => {
+			if (currentHero && currentHero[0]) {
+				currentHero = currentHero[0];
+				let relations = [];
+				currentHero.relations.forEach((relation) => {
+					relations.push(relation.hero);
+				});
+
+				//get data of all heroes on relation
+				let queryCursorForRelationship = collection
+					.find({ fileId: { $in: [...relations] } })
+					.project({ name: 1, fileId: 1, _id: 0 });
+
+				return queryCursorForRelationship.toArray().then((relationHeroes) => {
+					if (relationHeroes && relationHeroes.length) {
+						let newRelationArray = currentHero.relations.map((hero) => {
+							let currSome = 0;
+							if (
+								relationHeroes.some((e, i) => {
+									currSome = i;
+									return e.fileId === hero.hero;
+								})
+							) {
+								return { ...hero, ...relationHeroes[currSome] };
+							}
+						});
+						//clean the array entries of heroes I don't have data on
+						currentHero.relations = newRelationArray.filter((e) => {
+							if (e) {
+								//already have the name and fileId
+								delete e.hero;
+							}
+							return e !== undefined;
+						});
+
+						return mountApiResponse({}, res, null, [currentHero]);
+					} else {
+						return mountApiResponse({}, res, null, [currentHero]);
+					}
+				});
+			} else {
+				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
+			}
+		});
 	})
 );
 router.get(
