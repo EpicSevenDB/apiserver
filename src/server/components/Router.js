@@ -125,11 +125,8 @@ router.get(
 							}
 							return e !== undefined;
 						});
-
-						return mountApiResponse({}, res, null, [currentHero]);
-					} else {
-						return mountApiResponse({}, res, null, [currentHero]);
 					}
+					return mountApiResponse({}, res, null, [currentHero]);
 				});
 			} else {
 				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
