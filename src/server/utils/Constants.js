@@ -52,7 +52,7 @@ export const MESSAGES = {
 		},
 	},
 	query: {
-		invalid: 'Invalid request. Please read the API docs.',
+		invalid: 'Invalid request. Please read the API docs. Open an issue on Github if this keeps happening.',
 		limitExceeded: 'Too many requests, please try again soon.',
 	},
 };
