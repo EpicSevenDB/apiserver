@@ -99,7 +99,7 @@ router.get(
 						.find({ fileId: { $in: [...relations] } })
 						.project({ name: 1, fileId: 1, _id: 0 });
 
-					return await queryCursorForRelationship.toArray().then((relationHeroes) => {
+					return await queryCursorForRelationship.toArray().then(async (relationHeroes) => {
 						if (relationHeroes && relationHeroes.length) {
 							let newRelationArray = currentHero.relations.map((hero) => {
 								let currSome = 0;
@@ -124,7 +124,25 @@ router.get(
 							//clean relations as we have zero heroes on relations
 							currentHero.relations = [];
 						}
-						return mountApiResponse({}, res, null, [currentHero]);
+
+						//no specialty, end
+						if (!currentHero.specialtyChangeName) {
+							return mountApiResponse({}, res, null, [currentHero]);
+						}
+
+						let queryCursorForSpecialty = collection
+							.find({ fileId: currentHero.specialtyChangeName })
+							.project({ _id: 0, name: 1 })
+							.limit(1);
+
+						return await queryCursorForSpecialty.toArray().then((specialtyHeros) => {
+							if (!specialtyHeros || !specialtyHeros.length) {
+								return mountApiResponse({}, res, null, [currentHero]);
+							}
+							currentHero.specialtyChangeNameFull = specialtyHeros[0].name;
+
+							return mountApiResponse({}, res, null, [currentHero]);
+						});
 					});
 				} else {
 					return new Promise.reject();
