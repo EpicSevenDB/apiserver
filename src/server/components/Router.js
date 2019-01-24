@@ -139,8 +139,10 @@ router.get(
 							if (!specialtyHeros || !specialtyHeros.length) {
 								return mountApiResponse({}, res, null, [currentHero]);
 							}
-							currentHero.specialtyChangeNameFull = specialtyHeros[0].name;
-
+							currentHero.specialtyChangeName = {
+								fileId: currentHero.specialtyChangeName,
+								name: specialtyHeros[0].name,
+							};
 							return mountApiResponse({}, res, null, [currentHero]);
 						});
 					});
