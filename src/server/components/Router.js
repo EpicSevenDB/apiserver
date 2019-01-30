@@ -46,6 +46,7 @@ router.get(
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
 				rarity: -1,
+				name: 1,
 			});
 
 		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
@@ -175,6 +176,7 @@ router.get(
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
 				rarity: -1,
+				name: 1,
 			});
 
 		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
