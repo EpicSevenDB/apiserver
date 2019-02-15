@@ -10,7 +10,6 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"init": "rm -rf ./dist/* & rm -rf ./node_modules/*; npm install",
 		"start": "node dist/server/Application.js",
-		"postinstall": "npm run build",
 		"clean:dist": "rimraf ./dist/*",
 		"prebuild": "run-s codestandard clean:dist",
 		"build:server": "babel --extends=src/server/.babelrc src/server -d dist/server",
@@ -110,5 +109,6 @@
 		"rules": {
 			"prettier/prettier": "error"
 		}
-	}
+	},
+	"heroku-run-build-script": true
 }
