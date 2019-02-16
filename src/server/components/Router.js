@@ -166,20 +166,73 @@ router.get(
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 
-		// req.params.results resource/{number}
-		// req.query.results resource?results={number}
+		let queryCursorForHeroList = collection
+			.aggregate([
+				{
+					$project: {
+						_id: 0,
+						name: 1,
+						rarity: 1,
+						element: 1,
+						classType: 1,
+						fileId: 1,
+						skills: 1,
+					},
+				},
+				{
+					$addFields: {
+						buffs: {
+							$map: {
+								input: '$skills.buffs',
+								as: 'el',
+								in: '$$el',
+							},
+						},
+						debuffs: {
+							$map: {
+								input: '$skills.debuffs',
+								as: 'el',
+								in: '$$el',
+							},
+						},
+					},
+				},
+				{
+					$project: {
+						skills: 0,
+					},
+				},
 
-		// https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/
-		let queryCursor = collection
-			.find()
-			.project({ _id: 0, name: 1, rarity: 1, element: 1, classType: 1, fileId: 1 })
+				// {
+				//     $reduce: {
+				//         input: '$$buffs',
+				//         initialValue: [],
+				//         in: { $concatArrays: ['$$value', '$$this'] },
+				//     },
+				// },
+			])
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
 				rarity: -1,
 				name: 1,
 			});
 
-		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+		return await queryCursorForHeroList
+			.toArray()
+			.then((heroList = []) => {
+				if (heroList.length) {
+					heroList.forEach((hero) => {
+						hero.buffs = [].concat(...hero.buffs);
+						hero.debuffs = [].concat(...hero.debuffs);
+					});
+					return mountApiResponse({}, res, null, heroList);
+				} else {
+					return new Promise.reject();
+				}
+			})
+			.catch(() => {
+				return mountApiErrorResponse(res, MESSAGES.query.invalid);
+			});
 	})
 );
 
