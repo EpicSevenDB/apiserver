@@ -6,6 +6,54 @@ import { MESSAGES } from '../utils/Constants';
 const router = express.Router();
 
 //* ------------------------
+// Items
+//------------------------ */
+router.get(
+	'/item/:fileId',
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('item'),
+			{ fileId } = req.params;
+
+		if (!collection || !fileId) {
+			return mountApiErrorResponse(res, MESSAGES.query.invalid);
+		}
+
+		let queryCursor = collection
+			.find({
+				fileId,
+			})
+			.limit(1);
+
+		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+	})
+);
+router.get(
+	'/item',
+	// `:variable`, `:optionalvariable?`
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('item');
+
+		if (!collection) {
+			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
+		}
+
+		// req.params.results resource/{number}
+		// req.query.results resource?results={number}
+
+		let queryCursor = collection
+			.find()
+			// .project({ loreDescription: 0, skillDescription: 0, stats: 0, _id: 0 })
+			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
+			.sort({
+				rarity: -1,
+				name: 1,
+			});
+
+		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+	})
+);
+
+//* ------------------------
 // Artifacts
 //------------------------ */
 router.get(
@@ -171,11 +219,12 @@ router.get(
 				{
 					$project: {
 						_id: 0,
+						fileId: 1,
 						name: 1,
 						rarity: 1,
 						element: 1,
 						classType: 1,
-						fileId: 1,
+						zodiac: 1,
 						skills: 1,
 					},
 				},
