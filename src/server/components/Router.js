@@ -26,7 +26,7 @@ router.get(
 			// .project({ loreDescription: 0, skillDescription: 0, stats: 0, _id: 0 })
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
-				rarity: -1,
+				type: 1,
 				name: 1,
 			});
 
