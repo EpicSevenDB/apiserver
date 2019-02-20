@@ -9,25 +9,6 @@ const router = express.Router();
 // Items
 //------------------------ */
 router.get(
-	'/item/:fileId',
-	asyncRoute(async (req, res, next) => {
-		const collection = Database.getCollection('item'),
-			{ fileId } = req.params;
-
-		if (!collection || !fileId) {
-			return mountApiErrorResponse(res, MESSAGES.query.invalid);
-		}
-
-		let queryCursor = collection
-			.find({
-				fileId,
-			})
-			.limit(1);
-
-		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
-	})
-);
-router.get(
 	'/item',
 	// `:variable`, `:optionalvariable?`
 	asyncRoute(async (req, res, next) => {
