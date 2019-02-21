@@ -180,90 +180,9 @@ router.get(
 			});
 	})
 );
+
 router.get(
-	'/hero',
-	// `:variable`, `:optionalvariable?`
-	asyncRoute(async (req, res, next) => {
-		const collection = Database.getCollection('hero');
-
-		if (!collection) {
-			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
-		}
-
-		let queryCursorForHeroList = collection
-			.aggregate([
-				{
-					$project: {
-						_id: 0,
-						fileId: 1,
-						name: 1,
-						rarity: 1,
-						element: 1,
-						classType: 1,
-						zodiac: 1,
-						skills: 1,
-					},
-				},
-				{
-					$addFields: {
-						buffs: {
-							$map: {
-								input: '$skills.buffs',
-								as: 'el',
-								in: '$$el',
-							},
-						},
-						debuffs: {
-							$map: {
-								input: '$skills.debuffs',
-								as: 'el',
-								in: '$$el',
-							},
-						},
-					},
-				},
-				{
-					$project: {
-						skills: 0,
-					},
-				},
-
-				// {
-				//     $reduce: {
-				//         input: '$$buffs',
-				//         initialValue: [],
-				//         in: { $concatArrays: ['$$value', '$$this'] },
-				//     },
-				// },
-			])
-			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
-			.sort({
-				rarity: -1,
-				name: 1,
-			});
-
-		return await queryCursorForHeroList
-			.toArray()
-			.then((heroList = []) => {
-				if (heroList.length) {
-					heroList.forEach((hero) => {
-						hero.buffs = [].concat(...hero.buffs);
-						hero.debuffs = [].concat(...hero.debuffs);
-					});
-					return mountApiResponse({}, res, null, heroList);
-				} else {
-					return new Promise.reject();
-				}
-			})
-			.catch(() => {
-				return mountApiErrorResponse(res, MESSAGES.query.invalid);
-			});
-	})
-);
-
-//EXPERIMENT
-router.get(
-	'/hero2/:_id',
+	'/hero/:_id',
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('hero'),
 			{ _id } = req.params;
@@ -334,6 +253,8 @@ router.get(
 		]);
 
 		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+
+		//LE OLD WAY, 3 calls, but faster... lol
 
 		// //get hero
 		// let queryCursor = collection
