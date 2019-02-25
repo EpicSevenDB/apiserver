@@ -6,6 +6,7 @@ import Server from './components/Server';
 import Database from './components/Database';
 import { asyncRoute, asyncErrorRoute, cLog, mountApiErrorResponse } from './utils/Utility';
 import { MESSAGES, HEADERS, VERSION } from './utils/Constants';
+import { URL } from 'url';
 
 const server = new Server({
 	Database,
@@ -56,6 +57,24 @@ process.on('SIGTERM', () => {
 const limiter = rateLimit({
 	max: 50,
 	windowMs: 60 * 1000, // 1 minute
+	keyGenerator: (req /*, res */) => {
+		let domain = 'no-referer';
+		if (req.headers.referer) {
+			// spelled wrong per the RFC
+			try {
+				let refererUrl = '';
+				if (req.headers.referer.indexOf('http') === -1) {
+					refererUrl = new URL('http://' + req.headers.referer); // this can throw if the header is invalid
+				} else {
+					refererUrl = new URL(req.headers.referer); // this can throw if the header is invalid
+				}
+				domain = refererUrl.hostname;
+			} catch (err) {
+				cLog('warn', `Error parsing referrer ${req.headers.referer} from IP ${req.ip}`, err);
+			}
+		}
+		return `${domain}:${req.ip}`;
+	},
 	handler: function(req, res /*next*/) {
 		return mountApiErrorResponse(res, MESSAGES.query.limitExceeded);
 	},

@@ -94,145 +94,126 @@ router.get(
 			return mountApiErrorResponse(res, MESSAGES.query.invalid);
 		}
 
-		let queryCursor = collection.aggregate([
-			{ $match: { _id } },
-			//list of possible buff/debuff
-			{
-				$addFields: {
-					buffs: {
-						$map: {
-							input: '$skills.buffs',
-							as: 'el',
-							in: '$$el',
-						},
-					},
-					debuffs: {
-						$map: {
-							input: '$skills.debuffs',
-							as: 'el',
-							in: '$$el',
-						},
-					},
-				},
-			},
-			//populate relations
-			{
-				$lookup: {
-					from: 'hero',
-					let: { letId: '$relations.hero' },
-					// localField: "relations.hero", //this would bring entire hero data, which is unnecesary
-					// foreignField: "_id",  //this would bring entire hero data, which is unnecesary
-					pipeline: [
-						//match each $relations.hero (as "$$letId") in collection hero's (as "from") $_id
-						{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
-						{ $project: { name: 1, fileId: 1, _id: 1 } },
-					],
-					as: 'relations',
-				},
-			},
-			//populate specialtyChangeName
-			{
-				$lookup: {
-					from: 'hero',
-					let: { letId: ['$specialtyChangeName'] }, //fake letId into array
-					// localField: "relations.hero",
-					// foreignField: "_id",
-					pipeline: [
-						//match each $relations.hero (as "$$letId") in collection hero's (as "from") $_id
-						{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
-						{ $project: { name: 1, fileId: 1, _id: 1 } },
-					],
-					as: 'specialtyChangeName',
-				},
-			},
-			//make specialtyChangeName from array into object with the projected data
-			{
-				$unwind: {
-					path: '$specialtyChangeName',
-					//just don't unwind if doesn't exist, if false, it'll not return a hero document
-					preserveNullAndEmptyArrays: true,
-				},
-			},
-		]);
+		// let queryCursor = collection.aggregate([
+		// 	{ $match: { _id } },
+		//     // populate relations
+		// 	{
+		// 		$lookup: {
+		// 			from: 'hero',
+		// 			let: { letId: '$relations.hero' },
+		// 			// localField: "relations.hero", //this would bring entire hero data, which is unnecesary
+		// 			// foreignField: "_id",  //this would bring entire hero data, which is unnecesary
+		// 			pipeline: [
+		// 				//match each $relations.hero (as "$$letId") in collection hero's (as "from") $_id
+		//                 { $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+		//                 { $project: { name: 1, fileId: 1, _id: 1 } },
+		//                 // {$sort:{name:1}},
+		// 			],
+		// 			as: 'relations',
+		// 		},
+		//     },
 
-		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+		// 	//populate specialtyChangeName
+		// 	{
+		// 		$lookup: {
+		// 			from: 'hero',
+		// 			let: { letId: ['$specialtyChangeName'] }, //fake letId into array
+		// 			// localField: "relations.hero",
+		// 			// foreignField: "_id",
+		// 			pipeline: [
+		// 				{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+		// 				{ $project: { name: 1, fileId: 1, _id: 1 } },
+		// 			],
+		// 			as: 'specialtyChangeName',
+		// 		},
+		// 	},
+		// 	//make specialtyChangeName from array into object with the projected data
+		// 	{
+		// 		$unwind: {
+		// 			path: '$specialtyChangeName',
+		// 			//just don't unwind if doesn't exist, if false, it'll not return a hero document
+		// 			preserveNullAndEmptyArrays: true,
+		// 		},
+		// 	},
+		// ]);
+
+		// return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
 
 		//LE OLD WAY, 3 calls, but faster... lol
 
-		// //get hero
-		// let queryCursor = collection
-		// 	.find({ _id })
-		// 	.limit(1);
+		//get hero
+		let queryCursor = collection.find({ _id }).limit(1);
 
-		// return await queryCursor
-		// 	.toArray()
-		// 	.then(async (currentHero) => {
-		// 		if (currentHero && currentHero[0]) {
-		// 			currentHero = currentHero[0];
-		// 			let relations = [];
-		// 			currentHero.relations.forEach((relation) => {
-		// 				relations.push(relation.hero);
-		// 			});
+		return await queryCursor
+			.toArray()
+			.then(async (currentHero) => {
+				if (currentHero && currentHero[0]) {
+					currentHero = currentHero[0];
+					let relations = [];
+					currentHero.relations.forEach((relation) => {
+						relations.push(relation.hero);
+					});
 
-		// 			//get data of all heroes on relation
-		// 			let queryCursorForRelationship = collection
-		// 				.find({ fileId: { $in: [...relations] } })
-		// 				.project({ name: 1, fileId: 1, _id: 0 });
+					//get data of all heroes on relation
+					let queryCursorForRelationship = collection
+						.find({ fileId: { $in: [...relations] } })
+						.project({ name: 1, fileId: 1, _id: 1 });
 
-		// 			return await queryCursorForRelationship.toArray().then(async (relationHeroes) => {
-		// 				if (relationHeroes && relationHeroes.length) {
-		// 					let newRelationArray = currentHero.relations.map((hero) => {
-		// 						let currSome = 0;
-		// 						if (
-		// 							relationHeroes.some((e, i) => {
-		// 								currSome = i;
-		// 								return e.fileId === hero.hero;
-		// 							})
-		// 						) {
-		// 							return { ...hero, ...relationHeroes[currSome] };
-		// 						}
-		// 					});
-		// 					//clean the array entries of heroes I don't have data on
-		// 					currentHero.relations = newRelationArray.filter((e) => {
-		// 						if (e && e.name) {
-		// 							//already have the name and fileId
-		// 							delete e.hero;
-		// 						}
-		// 						return e !== undefined;
-		// 					});
-		// 				} else {
-		// 					//clean relations as we have zero heroes on relations
-		// 					currentHero.relations = [];
-		// 				}
+					return await queryCursorForRelationship.toArray().then(async (relationHeroes) => {
+						if (relationHeroes && relationHeroes.length) {
+							let newRelationArray = currentHero.relations.map((hero) => {
+								let currSome = 0;
+								if (
+									relationHeroes.some((e, i) => {
+										currSome = i;
+										return e.fileId === hero.hero || e._id === hero.hero;
+									})
+								) {
+									return { ...hero, ...relationHeroes[currSome] };
+								}
+							});
+							//clean the array entries of heroes I don't have data on
+							currentHero.relations = newRelationArray.filter((e) => {
+								if (e && e.name) {
+									//already have the name and fileId
+									delete e.hero;
+								}
+								return e !== undefined;
+							});
+						} else {
+							//clean relations as we have zero heroes on relations
+							currentHero.relations = [];
+						}
 
-		// 				//no specialty, end
-		// 				if (!currentHero.specialtyChangeName) {
-		// 					return mountApiResponse({}, res, null, [currentHero]);
-		// 				}
+						//no specialty, end
+						if (!currentHero.specialtyChangeName) {
+							return mountApiResponse({}, res, null, [currentHero]);
+						}
 
-		// 				let queryCursorForSpecialty = collection
-		// 					.find({ fileId: currentHero.specialtyChangeName })
-		// 					.project({ _id: 0, name: 1 })
-		// 					.limit(1);
+						let queryCursorForSpecialty = collection
+							.find({ fileId: currentHero.specialtyChangeName })
+							.project({ _id: 1, name: 1 })
+							.limit(1);
 
-		// 				return await queryCursorForSpecialty.toArray().then((specialtyHeros) => {
-		// 					if (!specialtyHeros || !specialtyHeros.length) {
-		// 						return mountApiResponse({}, res, null, [currentHero]);
-		// 					}
-		// 					currentHero.specialtyChangeName = {
-		// 						fileId: currentHero.specialtyChangeName,
-		// 						name: specialtyHeros[0].name,
-		// 					};
-		// 					return mountApiResponse({}, res, null, [currentHero]);
-		// 				});
-		// 			});
-		// 		} else {
-		// 			return new Promise.reject();
-		// 		}
-		// 	})
-		// 	.catch(() => {
-		// 		return mountApiErrorResponse(res, MESSAGES.query.invalid);
-		// 	});
+						return await queryCursorForSpecialty.toArray().then((specialtyHeros) => {
+							if (!specialtyHeros || !specialtyHeros.length) {
+								return mountApiResponse({}, res, null, [currentHero]);
+							}
+							currentHero.specialtyChangeName = {
+								_id: specialtyHeros[0]._id,
+								fileId: currentHero.specialtyChangeName,
+								name: specialtyHeros[0].name,
+							};
+							return mountApiResponse({}, res, null, [currentHero]);
+						});
+					});
+				} else {
+					return new Promise.reject();
+				}
+			})
+			.catch(() => {
+				return mountApiErrorResponse(res, MESSAGES.query.invalid);
+			});
 	})
 );
 
@@ -283,14 +264,6 @@ router.get(
 						skills: 0,
 					},
 				},
-
-				// {
-				//     $reduce: {
-				//         input: '$$buffs',
-				//         initialValue: [],
-				//         in: { $concatArrays: ['$$value', '$$this'] },
-				//     },
-				// },
 			])
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
