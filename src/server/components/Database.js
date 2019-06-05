@@ -31,15 +31,12 @@ class Database {
 	}
 
 	connect() {
-		return MongoClient.connect(
-			DB.url,
-			{
-				useNewUrlParser: true,
-				autoReconnect: true,
-				reconnectTries: 100,
-				reconnectInterval: 5000, //ms
-			}
-		)
+		return MongoClient.connect(DB.url, {
+			useNewUrlParser: true,
+			autoReconnect: true,
+			reconnectTries: 100,
+			reconnectInterval: 5000, //ms
+		})
 			.then((client) => {
 				this.client = client;
 				this.db = this.client.db(DB.name);

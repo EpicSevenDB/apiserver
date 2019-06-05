@@ -6,6 +6,70 @@ import { MESSAGES } from '../utils/Constants';
 const router = express.Router();
 
 //* ------------------------
+// Latest
+//------------------------ */
+router.get(
+	'/latest',
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('latest');
+
+		if (!collection) {
+			return mountApiErrorResponse(res, MESSAGES.query.invalid);
+		}
+
+		let queryCursor = collection.aggregate([
+			{
+				$lookup: {
+					from: 'hero',
+					let: { letId: '$hero' },
+					pipeline: [
+						{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+						{
+							$project: {
+								_id: 1,
+								fileId: 1,
+								name: 1,
+								rarity: 1,
+								element: 1,
+								classType: 1,
+								zodiac: 1,
+							},
+						},
+					],
+					as: 'hero',
+				},
+			},
+			{
+				$lookup: {
+					from: 'artifact',
+					let: { letId: '$artifact' },
+					pipeline: [
+						{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+						{
+							$project: { loreDescription: 0, skillDescription: 0, stats: 0 },
+						},
+					],
+					as: 'artifact',
+				},
+			},
+		]);
+
+		return await queryCursor
+			.toArray()
+			.then((latestStuff) => {
+				if (latestStuff && latestStuff[0]) {
+					return mountApiResponse({}, res, null, [latestStuff[0]]);
+				} else {
+					return new Promise.reject();
+				}
+			})
+			.catch(() => {
+				return mountApiErrorResponse(res, MESSAGES.query.invalid);
+			});
+	})
+);
+
+//* ------------------------
 // Items
 //------------------------ */
 router.get(
@@ -89,7 +153,7 @@ router.get(
 
 		let queryCursor = collection
 			.find()
-			.project({ loreDescription: 0, skillDescription: 0, stats: 0, _id: 0 })
+			.project({ loreDescription: 0, skillDescription: 0, stats: 0 })
 			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
 			.sort({
 				rarity: -1,
@@ -250,7 +314,7 @@ router.get(
 			.aggregate([
 				{
 					$project: {
-						_id: 0,
+						_id: 1,
 						fileId: 1,
 						name: 1,
 						rarity: 1,
