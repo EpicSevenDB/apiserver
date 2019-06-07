@@ -55,7 +55,7 @@ process.on('SIGTERM', () => {
 // Limit to 50 requests per minute
 // limit each IP to {max} requests per {windowMs}
 const limiter = rateLimit({
-	max: 50,
+	max: 300,
 	windowMs: 60 * 1000, // 1 minute
 	keyGenerator: (req /*, res */) => {
 		let domain = 'no-referer';
@@ -82,9 +82,7 @@ const limiter = rateLimit({
 		//log a console with IP
 		cLog(
 			'warn',
-			`WARN: Too many requests to the API coming from IP ${
-				req.ip
-			}. If this message continues for this IP, might be a DDOS attack.`
+			`WARN: Too many requests to the API coming from IP ${req.ip}. If this message continues for this IP, might be a DDOS attack.`
 		);
 	},
 });
