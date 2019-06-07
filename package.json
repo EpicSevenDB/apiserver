@@ -1,6 +1,6 @@
 {
 	"name": "epicsevendb-apiserver",
-	"version": "0.4.0",
+	"version": "0.5.1",
 	"description": "EpicSevenDB.com API Server",
 	"main": "dist/server/Application.js",
 	"engines": {
@@ -71,7 +71,7 @@
 		"node-sass": "^4.9.3",
 		"node-sass-import": "^2.0.1",
 		"nodemon": "^1.19.1",
-		"prettier": "^1.13.7",
+		"prettier": "^1.18.2",
 		"prettier-eslint-cli": "^4.7.1",
 		"pretty-quick": "^1.11.0",
 		"request": "^2.88.0",
