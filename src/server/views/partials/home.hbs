@@ -37,12 +37,12 @@
                     Everything on EpicSevenDB is licensed as <a href="https://github.com/EpicSevenDB/apiserver/blob/master/LICENSE" target="_blank"><strong class="has-text-info">Attribution-NonCommercial-ShareAlike 4.0 International</strong></a>, that is, free for non-commercial use. In sum, whatever you do with it, you CANNOT monetize it, for example, having Advertisements, ask for payment/donation to remove Ads or unlock other data.
                 </p>
 
-                <h3 class="title is-4">
-                    Request Limit
-                </h3>
-                <p>
-                    The API has a hard-cap of 50 calls per minute. Any more than that and you'll get error <strong class="has-text-info">418 - I'm a Teapot!</strong>. Let me know if you require more than that so we can discuss :)
-                </p>
+                <div class="notification is-danger">
+                    <p><strong class="is-4">Request Limit:</strong></p>
+                    <p>
+                        The API has a hard-cap of 50 calls per minute. Any more than that and you'll get error <strong class="has-text-info">418 - I'm a Teapot!</strong>. Let me know if you require more than that so we can discuss :)
+                    </p>
+                </div>
 
                 <h3 class="title is-4">
                     How to use - Overview
@@ -1200,6 +1200,50 @@
 
 				</div>
 
+
+                <h3 class="title is-4">
+                    How to use - ASSETS
+                </h3>
+                <p>
+                    You can also link directly to our <strong class="has-text-info">assets</strong> when you need to provide images.
+                </p>
+
+                <p>Scheme #1:</p>
+                <div class="message">
+                    <pre class="message-body">https://assets.epicsevendb.com/<strong class="has-text-info">{:hero|artifact}</strong>/<strong class="has-text-info">{:?_id}</strong>/<strong class="has-text-info">{:?assetType}</strong>.<strong class="has-text-info">{:imageExtension}</strong></pre>
+                </div>
+                <p>
+                    Hero has the following image types:
+                    <ul>
+                        <li><strong class="has-text-info">full.png</strong> (upper body portrait) - https://assets.epicsevendb.com/hero/bellona/full.png</li>
+                        <li><strong class="has-text-info">small.png</strong> (the list image) - https://assets.epicsevendb.com/hero/bellona/icon.png</li>
+                        <li><strong class="has-text-info">icon.png</strong> (round face icon) - https://assets.epicsevendb.com/hero/bellona/icon.png</li>
+                        <li><strong class="has-text-info">sk_#.png</strong> (the skill icon, where # is the skill slot. If the skill is passive, add a <strong>p</strong> after the number, e.g. sk_2p.png) - https://assets.epicsevendb.com/hero/bellona/sk_2.png</li>
+                    </ul>
+                </p>
+                <p>
+                    Artifact has the following image types:
+                    <ul>
+                        <li><strong class="has-text-info">full.png</strong> (full art) - https://assets.epicsevendb.com/artifact/iron-fan/full.png</li>
+                        <li><strong class="has-text-info">small.png</strong> (the list image, always JPG) - https://assets.epicsevendb.com/artifact/iron-fan/small.jpg</li>
+                        <li><strong class="has-text-info">icon.png</strong> (round icon) - https://assets.epicsevendb.com/artifact/iron-fan/icon.png</li>
+                    </ul>
+                </p>
+
+                <p>Scheme #2:</p>
+                <div class="message">
+                    <pre class="message-body">https://assets.epicsevendb.com/<strong class="has-text-info">{:item|class|attribute|buff|relationship|zodiac-sign}</strong>/<strong class="has-text-info">{:?_id}</strong>.<strong class="has-text-info">{:imageExtension}</strong></pre>
+                </div>
+                <p>
+                    <ul>
+                        <li><strong class="has-text-info">Item</strong> - https://assets.epicsevendb.com/item/dragons-wrath.png</li>
+                        <li><strong class="has-text-info">Class</strong> (cm_icon_role_{classname}.png) - https://assets.epicsevendb.com/class/cm_icon_role_ranger.png</li>
+                        <li><strong class="has-text-info">Attribute</strong> (cm_icon_pro{element}.png - Some elements are _PRO{element}, some are _PROM{element}) - https://assets.epicsevendb.com/attribute/cm_icon_proearth.png</li>
+                        <li><strong class="has-text-info">Buff</strong> (stic_{id}.png) - https://assets.epicsevendb.com/buff/stic_def_dn.png</li>
+                        <li><strong class="has-text-info">relationship</strong> (cm_icon_storymap_{id}.png) - https://assets.epicsevendb.com/relationship/cm_icon_storymap_trust.png</li>
+                        <li><strong class="has-text-info">zodiac-sign</strong> ({signOrder}_{signName}.png) - https://assets.epicsevendb.com/zodiac-sign/10_capricorn.png</li>
+                    </ul>
+                </p>
 
 
             </main>
