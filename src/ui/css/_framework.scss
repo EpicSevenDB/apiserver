@@ -1,6 +1,7 @@
 //Bulma.io overwrites
 $family-sans-serif: 'Lato', sans-serif;
 $link: #7db9f2;
+$link-hover: darken($link, 20%);
 $widescreen-enabled: false;
 $fullhd-enabled: false;
 $notification-background-color: rgba(0, 0, 0, 0.05);

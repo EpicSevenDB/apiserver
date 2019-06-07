@@ -22,19 +22,1183 @@
                     Github
                 </h3>
                 <p>
-                    <a href="https://github.com/EpicSevenDB/apiserver" target="_blank"><strong class="has-text-info">Github Page</strong></a>
+                    <a href="https://github.com/EpicSevenDB/ui" target="_blank"><strong class="has-text-info">EpicSevenDB UI Github Page</strong></a>
+                </p>
+                <p>
+                    <a href="https://github.com/EpicSevenDB/apiserver" target="_blank"><strong class="has-text-info">EpicSevenDB API Github Page</strong></a>
                 </p>
                 <br><br>
-                <a name="howto"></a>
+
+
                 <h3 class="title is-4">
-                    How to use
+                    LICENSE
                 </h3>
                 <p>
-                    You can use <strong class="has-text-info">XMLHttpRequest</strong> to call the EpicSevenDB API. The API is configured with CORS, therefore you don't need to worry about Cross-Domain XHR issues.
+                    Everything on EpicSevenDB is licensed as <a href="https://github.com/EpicSevenDB/apiserver/blob/master/LICENSE" target="_blank"><strong class="has-text-info">Attribution-NonCommercial-ShareAlike 4.0 International</strong></a>, that is, free for non-commercial use. In sum, whatever you do with it, you CANNOT monetize it, for example, having Advertisements, ask for payment/donation to remove Ads or unlock other data.
                 </p>
-                <div class="message">
-                    <pre class="message-body">https://epicsevendb-apiserver.herokuapp.com/api/<strong class="has-text-info">{:resourceType}</strong>/<strong class="has-text-info">{:resource}</strong><strong class="has-text-info">{:?querystringOrParam}</strong></pre>
+
+
+
+                <h3 class="title is-4">
+                    How to use - Overview
+                </h3>
+                <p>
+                    You can use <strong class="has-text-info">XMLHttpRequest</strong> to call the EpicSevenDB API. The API is configured with CORS, therefore you don't need to worry about Cross-Domain XHR issues. You can also call from your backend if you need, with fetch, curl or any other way you'd prefer.
+                </p>
+                <div class="notification is-warning">
+                    <p><strong class="is-4">Important:</strong></p>
+                    <p>
+                        This documentation was made when API version was <strong class="has-text-info">0.5.0</strong>. When using it, please access the URL of the route you want to make sure what you expected (and what is presented on this page) is still valid. I'll try keep this page (and this notice) updated.
+                    </p>
                 </div>
+                <p>Scheme:</p>
+                <div class="message">
+                    <pre class="message-body">https://epicsevendb-apiserver.herokuapp.com/api/<strong class="has-text-info">{:type}</strong>/<strong class="has-text-info">{:?_id}</strong></pre>
+                </div>
+                <p>
+                    Where, for <strong>type</strong>: <br>
+                    <ul>
+                        <li>Latest Heroes and Artifacts <pre class="message-body">/api/<strong class="has-text-info">latest</strong></pre></li>
+                        <li>Hero <pre class="message-body">/api/<strong class="has-text-info">hero</strong></pre></li>
+                        <li>Artifact <pre class="message-body">/api/<strong class="has-text-info">artifact</strong></pre></li>
+                        <li>Item <pre class="message-body">/api/<strong class="has-text-info">item</strong></pre></li>
+                    </ul>
+                    The response will ALWAYS contain a <strong class="has-text-info">meta</strong> object containing api version and request date, in case you'd like to cache. Array <strong class="has-text-info">results</strong> with either 0, 1 or more objects will be sent when Route and _id are correct. When the route or _id is wrong, it'll come with extra <strong class="has-text-info">error</strong> and <strong class="has-text-info">stack</strong> properties, pointing the error.
+                </p>
+
+                <h3 class="title is-4">
+                    How to use - Latest
+                </h3>
+                <p>
+                    You can request the list of latest heroes and artifacts with <strong class="has-text-info">/api/latest</strong>. For details of either hero or artifact, use the respective type endpoint. Example API response below:
+                </p>
+                <div class="tabs">
+					<ul>
+						<li class="is-active">
+							<a href="#" data-results="latest">
+								Latest
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="codetabs">
+					<div data-code="latest">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "index",
+      "hero": [
+        {
+          "_id": "angelic-montmorancy",
+          "name": "Angelic Montmorancy",
+          "rarity": 3,
+          "classType": "soul-weaver",
+          "element": "ice",
+          "zodiac": "pisces",
+          "fileId": "angelic-montmorancy"
+        },
+        {
+          "_id": "fallen-cecilia",
+          "name": "Fallen Cecilia (Preview)",
+          "rarity": 5,
+          "classType": "knight",
+          "element": "dark",
+          "zodiac": "sagittarius",
+          "fileId": "fallen-cecilia"
+        },
+        {
+          "_id": "luluca",
+          "name": "Luluca",
+          "rarity": 5,
+          "classType": "mage",
+          "element": "ice",
+          "zodiac": "aquarius",
+          "fileId": "luluca"
+        }
+      ],
+      "artifact": [
+        {
+          "_id": "spirits-breath",
+          "name": "Spirit's Breath",
+          "rarity": 5,
+          "exclusive": [
+            "mage"
+          ],
+          "event": "",
+          "fileId": "spirits-breath"
+        },
+        {
+          "_id": "tear-of-the-desert",
+          "name": "Tear of the Desert",
+          "rarity": 4,
+          "exclusive": [
+            "mage"
+          ],
+          "event": "test-of-the-sandstorm",
+          "fileId": "tear-of-the-desert"
+        }
+      ],
+      "fileId": "index"
+    }
+  ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:31:26 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}</pre>
+						</div>
+						<em class="is-size-7">
+							*In latest, <strong class="has-text-info">results</strong> will always come with a single object, containing both <strong class="has-text-info">hero</strong> and <strong class="has-text-info">artifact</strong> properties. The format of those heroes and artifacts is the SAME as the hero and artifact list endpoints.
+						</em>
+					</div>
+                </div>
+
+
+                <h3 class="title is-4">
+                    How to use - Heroes
+                </h3>
+                <p>
+                    You can request the list of heroes with <strong class="has-text-info">/api/hero</strong> and the details of a single hero with <strong class="has-text-info">/api/hero/_id</strong>, where <strong>_id</strong> can be either <strong>fileId</strong> or <strong>_id</strong> found in the hero list. Example API response for both below:
+                </p>
+                <div class="tabs">
+					<ul>
+						<li class="is-active">
+							<a href="#" data-results="herolist">
+								List
+							</a>
+						</li>
+						<li>
+							<a href="#" data-results="herodetail">
+								Detail
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="codetabs">
+					<div data-code="herolist">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "aramintha",
+      "name": "Aramintha",
+      "rarity": 5,
+      "classType": "mage",
+      "element": "fire",
+      "zodiac": "gemini",
+      "fileId": "aramintha",
+      "buffs": [
+        "stic_att_up"
+      ],
+      "debuffs": [
+        "stic_blaze",
+        "stic_heal_impossible",
+        "stic_blaze",
+        "stic_blaze"
+      ]
+    },
+    {
+      "_id": "arbiter-vildred",
+      "name": "Arbiter Vildred",
+      "rarity": 5,
+      "classType": "thief",
+      "element": "dark",
+      "zodiac": "leo",
+      "fileId": "arbiter-vildred",
+      "buffs": [
+
+      ],
+      "debuffs": [
+        "stic_blind"
+      ]
+    }, { OTHER HERO OBJECTS* } ],
+   "meta": {
+    "requestDate": "Fri Jun 07 18:01:39 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}</pre>
+						</div>
+						<em class="is-size-7">
+							*In this example, <strong class="has-text-info">results</strong> was trimmed to two heroes for brevity
+						</em>
+					</div>
+
+					{{!-- make next examples with --}}
+					{{!-- div.is-hidden[data-code="example"]>(.message.has-description>pre.message-body) --}}
+					<div class="is-hidden" data-code="herodetail">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "aramintha",
+      "gameId": "c1048",
+      "name": "Aramintha",
+      "rarity": 5,
+      "classType": "mage",
+      "element": "fire",
+      "zodiac": "gemini",
+      "specialtyChangeName": "",
+      "selfSkillBarName": "",
+      "background": "Aramintha is a gentle and cheerful woman, and leader of the Phantom CIC, a group dedicated to investigating the Unknown to whom she lost her husband. She is an incredible fighter, but often gets caught up bragging about her husband when she's not in a battle.",
+      "relations": [
+        {
+          "relationType": "trust",
+          "_id": "basar",
+          "name": "Basar",
+          "fileId": "basar"
+        },
+        {
+          "relationType": "trust",
+          "_id": "rin",
+          "name": "Rin",
+          "fileId": "rin"
+        },
+        {
+          "relationType": "trust",
+          "_id": "celeste",
+          "name": "Celeste",
+          "fileId": "celeste"
+        },
+        {
+          "relationType": "trust",
+          "_id": "cartuja",
+          "name": "Cartuja",
+          "fileId": "cartuja"
+        },
+        {
+          "relationType": "trust",
+          "_id": "lots",
+          "name": "Lots",
+          "fileId": "lots"
+        },
+        {
+          "relationType": "trust",
+          "_id": "lidica",
+          "name": "Lidica",
+          "fileId": "lidica"
+        },
+        {
+          "relationType": "trust",
+          "_id": "bellona",
+          "name": "Bellona",
+          "fileId": "bellona"
+        },
+        {
+          "relationType": "trust",
+          "_id": "sez",
+          "name": "Sez",
+          "fileId": "sez"
+        }
+      ],
+      "stats": {
+        "lv1BaseStarNoAwaken": {
+          "cp": 1457,
+          "atk": 96,
+          "hp": 249,
+          "spd": 106,
+          "def": 85,
+          "chc": 0.15,
+          "chd": 1.5,
+          "eff": 0,
+          "efr": 0,
+          "dac": 0.05
+        },
+        "lv50FiveStarNoAwaken": {
+          "cp": 11781,
+          "atk": 771,
+          "hp": 3302,
+          "spd": 106,
+          "def": 551,
+          "chc": 0.15,
+          "chd": 1.5,
+          "eff": 0,
+          "efr": 0,
+          "dac": 0.05
+        },
+        "lv50FiveStarFullyAwakened": {
+          "cp": 13525,
+          "atk": 960,
+          "hp": 3642,
+          "spd": 106,
+          "def": 551,
+          "chc": 0.15,
+          "chd": 1.5,
+          "eff": 0.18,
+          "efr": 0,
+          "dac": 0.05
+        },
+        "lv60SixStarNoAwaken": {
+          "cp": 14685,
+          "atk": 961,
+          "hp": 4152,
+          "spd": 106,
+          "def": 683,
+          "chc": 0.15,
+          "chd": 1.5,
+          "eff": 0,
+          "efr": 0,
+          "dac": 0.05
+        },
+        "lv60SixStarFullyAwakened": {
+          "cp": 17342,
+          "atk": 1197,
+          "hp": 4572,
+          "spd": 106,
+          "def": 683,
+          "chc": 0.15,
+          "chd": 1.5,
+          "eff": 0.3,
+          "efr": 0,
+          "dac": 0.05
+        }
+      },
+      "skills": [
+        {
+          "isPassive": false,
+          "soulBurn": 0,
+          "selfSkillBarValue": 0,
+          "soulBurnEffect": "",
+          "awakenUpgrade": true,
+          "cooldown": 0,
+          "name": "Ignite",
+          "soulAcquire": 1,
+          "description": "Attacks an enemy with an explosion of flames, with a 35% chance to burn for 2 turns. Decreases cooldown of Fire Pillar by 1 turn.",
+          "enhancement": [
+            {
+              "description": "+10% damage dealt",
+              "resources": [
+                {
+                  "item": "molagora",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 4000
+                }
+              ]
+            },
+            {
+              "description": "+5% effect chance",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 3
+                },
+                {
+                  "item": "molagora",
+                  "qty": 3
+                },
+                {
+                  "item": "gold",
+                  "qty": 27000
+                }
+              ]
+            },
+            {
+              "description": "+10% effect chance",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 5
+                },
+                {
+                  "item": "molagora",
+                  "qty": 6
+                },
+                {
+                  "item": "gold",
+                  "qty": 49000
+                }
+              ]
+            },
+            {
+              "description": "+15% damage dealt",
+              "resources": [
+                {
+                  "item": "fused-nerve",
+                  "qty": 2
+                },
+                {
+                  "item": "molagorago",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 80000
+                }
+              ]
+            }
+          ],
+          "buffs": [
+
+          ],
+          "debuffs": [
+            "stic_blaze"
+          ],
+          "damageModifiers": [
+            {
+              "name": "pow",
+              "section": "pow",
+              "value": 1.05,
+              "soulburn": 1.05
+            },
+            {
+              "name": "statModifier",
+              "description": "",
+              "section": "additive",
+              "stat": "atk",
+              "type": "multiplier",
+              "target": "self",
+              "value": 1,
+              "soulburn": 1
+            }
+          ]
+        },
+        {
+          "isPassive": false,
+          "soulBurn": 0,
+          "selfSkillBarValue": 0,
+          "soulBurnEffect": "",
+          "awakenUpgrade": false,
+          "cooldown": 4,
+          "name": "Catalyst",
+          "soulAcquire": 2,
+          "description": "Sprinkles a catalyst, increasing Attack of all allies for 2 turns. If an enemy is burned, the catalyst will explode and deal damage to all enemies, making them unhealable for 2 turns.",
+          "enhancement": [
+            {
+              "description": "+5% damage dealt",
+              "resources": [
+                {
+                  "item": "molagora",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 4000
+                }
+              ]
+            },
+            {
+              "description": "-1 turn cooldown",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 3
+                },
+                {
+                  "item": "molagora",
+                  "qty": 3
+                },
+                {
+                  "item": "gold",
+                  "qty": 27000
+                }
+              ]
+            },
+            {
+              "description": "+10% damage dealt",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 5
+                },
+                {
+                  "item": "molagora",
+                  "qty": 6
+                },
+                {
+                  "item": "gold",
+                  "qty": 49000
+                }
+              ]
+            },
+            {
+              "description": "+15% damage dealt",
+              "resources": [
+                {
+                  "item": "fused-nerve",
+                  "qty": 2
+                },
+                {
+                  "item": "molagorago",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 80000
+                }
+              ]
+            }
+          ],
+          "buffs": [
+            "stic_att_up"
+          ],
+          "debuffs": [
+            "stic_heal_impossible",
+            "stic_blaze"
+          ],
+          "damageModifiers": [
+            {
+              "name": "pow",
+              "section": "pow",
+              "value": 1,
+              "soulburn": 1
+            },
+            {
+              "name": "statModifier",
+              "description": "",
+              "section": "additive",
+              "stat": "atk",
+              "type": "multiplier",
+              "target": "self",
+              "value": 0.7,
+              "soulburn": 0.7
+            }
+          ]
+        },
+        {
+          "isPassive": false,
+          "soulBurn": 20,
+          "selfSkillBarValue": 0,
+          "soulBurnEffect": "Ignores effect resistance.",
+          "awakenUpgrade": false,
+          "cooldown": 5,
+          "name": "Fire Pillar",
+          "soulAcquire": 2,
+          "description": "Attacks all enemies with a massive fire pillar, with a 80% chance to burn for 2 turns and increase the caster's Combat Readiness by 50%.",
+          "enhancement": [
+            {
+              "description": "+5% damage dealt",
+              "resources": [
+                {
+                  "item": "molagora",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 4000
+                }
+              ]
+            },
+            {
+              "description": "+5% damage dealt",
+              "resources": [
+                {
+                  "item": "molagora",
+                  "qty": 2
+                },
+                {
+                  "item": "gold",
+                  "qty": 8000
+                }
+              ]
+            },
+            {
+              "description": "+10% effect chance",
+              "resources": [
+                {
+                  "item": "molagora",
+                  "qty": 2
+                },
+                {
+                  "item": "gold",
+                  "qty": 8000
+                }
+              ]
+            },
+            {
+              "description": "-1 turn cooldown",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 3
+                },
+                {
+                  "item": "molagora",
+                  "qty": 3
+                },
+                {
+                  "item": "gold",
+                  "qty": 27000
+                }
+              ]
+            },
+            {
+              "description": "+10% effect chance",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 4
+                },
+                {
+                  "item": "molagorago",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 40000
+                }
+              ]
+            },
+            {
+              "description": "+10% damage dealt",
+              "resources": [
+                {
+                  "item": "ring-of-glory",
+                  "qty": 7
+                },
+                {
+                  "item": "molagorago",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 55000
+                }
+              ]
+            },
+            {
+              "description": "+10% damage dealt",
+              "resources": [
+                {
+                  "item": "fused-nerve",
+                  "qty": 3
+                },
+                {
+                  "item": "molagorago",
+                  "qty": 1
+                },
+                {
+                  "item": "gold",
+                  "qty": 110000
+                }
+              ]
+            }
+          ],
+          "buffs": [
+
+          ],
+          "debuffs": [
+            "stic_blaze"
+          ],
+          "damageModifiers": [
+            {
+              "name": "pow",
+              "section": "pow",
+              "value": 1,
+              "soulburn": 1
+            },
+            {
+              "name": "statModifier",
+              "description": "",
+              "section": "additive",
+              "stat": "atk",
+              "type": "multiplier",
+              "target": "self",
+              "value": 0.85,
+              "soulburn": 0.85
+            }
+          ]
+        }
+      ],
+      "specialtySkill": {
+        "name": "Leader of Phantom",
+        "description": "She is cold-hearted and resolute in achieving her goals.",
+        "dispatch": "[Strong Leader] Attribute",
+        "enhancement": "Reward Bonus +10%",
+        "stats": {
+          "command": 94,
+          "charm": 85,
+          "politics": 23
+        }
+      },
+      "camping": {
+        "options": [
+          "food-story",
+          "complain"
+        ],
+        "reactions": {
+          "advice": 5,
+          "belief": 4,
+          "bizarre-story": 0,
+          "comforting-cheer": 6,
+          "complain": 2,
+          "criticism": 2,
+          "cute-cheer": 5,
+          "dream": 4,
+          "food-story": 4,
+          "gossip": 2,
+          "happy-memory": 3,
+          "heroic-cheer": 6,
+          "heroic-tale": 6,
+          "horror-story": 0,
+          "interesting-story": 5,
+          "joyful-memory": 5,
+          "myth": 1,
+          "occult": -1,
+          "reality-check": -2,
+          "sad-memory": -1,
+          "self-indulgent": 4,
+          "unique-comment": 1
+        }
+      },
+      "memoryImprintFormation": {
+        "north": true,
+        "south": true,
+        "east": true,
+        "west": true
+      },
+      "memoryImprint": [
+        {
+          "rank": "d",
+          "status": {
+            "type": "atk",
+            "increase": 0
+          }
+        },
+        {
+          "rank": "c",
+          "status": {
+            "type": "atk",
+            "increase": 0
+          }
+        },
+        {
+          "rank": "b",
+          "status": {
+            "type": "atk",
+            "increase": 0.036
+          }
+        },
+        {
+          "rank": "a",
+          "status": {
+            "type": "atk",
+            "increase": 0.054
+          }
+        },
+        {
+          "rank": "s",
+          "status": {
+            "type": "atk",
+            "increase": 0.072
+          }
+        },
+        {
+          "rank": "ss",
+          "status": {
+            "type": "atk",
+            "increase": 0.09
+          }
+        },
+        {
+          "rank": "sss",
+          "status": {
+            "type": "atk",
+            "increase": 0.108
+          }
+        }
+      ],
+      "awakening": [
+        {
+          "rank": 1,
+          "skillUpgrade": false,
+          "statsIncrease": [
+            {
+              "atk": 0.03
+            },
+            {
+              "atk": 20
+            },
+            {
+              "hp": 60
+            }
+          ],
+          "resources": [
+            {
+              "item": "flame-rune",
+              "qty": 10
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "skillUpgrade": false,
+          "statsIncrease": [
+            {
+              "eff": 0.06
+            },
+            {
+              "atk": 20
+            },
+            {
+              "hp": 60
+            }
+          ],
+          "resources": [
+            {
+              "item": "flame-rune",
+              "qty": 15
+            },
+            {
+              "item": "greater-flame-rune",
+              "qty": 2
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "skillUpgrade": true,
+          "statsIncrease": [
+            {
+              "atk": 20
+            },
+            {
+              "hp": 60
+            }
+          ],
+          "resources": [
+            {
+              "item": "flame-rune",
+              "qty": 20
+            },
+            {
+              "item": "greater-flame-rune",
+              "qty": 10
+            }
+          ]
+        },
+        {
+          "rank": 4,
+          "skillUpgrade": false,
+          "statsIncrease": [
+            {
+              "eff": 0.12
+            },
+            {
+              "atk": 30
+            },
+            {
+              "hp": 80
+            }
+          ],
+          "resources": [
+            {
+              "item": "greater-flame-rune",
+              "qty": 10
+            },
+            {
+              "item": "epic-flame-rune",
+              "qty": 2
+            }
+          ]
+        },
+        {
+          "rank": 5,
+          "skillUpgrade": false,
+          "statsIncrease": [
+            {
+              "atk": 0.06
+            },
+            {
+              "atk": 30
+            },
+            {
+              "hp": 80
+            }
+          ],
+          "resources": [
+            {
+              "item": "epic-flame-rune",
+              "qty": 6
+            },
+            {
+              "item": "small-sun-badge",
+              "qty": 15
+            }
+          ]
+        },
+        {
+          "rank": 6,
+          "skillUpgrade": false,
+          "statsIncrease": [
+            {
+              "eff": 0.12
+            },
+            {
+              "atk": 30
+            },
+            {
+              "hp": 80
+            }
+          ],
+          "resources": [
+            {
+              "item": "epic-flame-rune",
+              "qty": 10
+            },
+            {
+              "item": "fused-nerve",
+              "qty": 10
+            }
+          ]
+        }
+      ],
+      "fileId": "aramintha"
+    }
+  ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:08:32 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}</pre>
+						</div>
+					</div>
+
+				</div>
+
+
+
+
+
+                <h3 class="title is-4">
+                    How to use - Artifacts
+                </h3>
+                <p>
+                    You can request the list of artifacts with <strong class="has-text-info">/api/artifact</strong> and the details of a single artifact with <strong class="has-text-info">/api/artifact/_id</strong>, where <strong>_id</strong> can be either <strong>fileId</strong> or <strong>_id</strong> found in the artifact list. Example API response for both below:
+                </p>
+                <div class="tabs">
+					<ul>
+						<li class="is-active">
+							<a href="#" data-results="artifactlist">
+								List
+							</a>
+						</li>
+						<li>
+							<a href="#" data-results="artifactdetail">
+								Detail
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="codetabs">
+					<div data-code="herolist">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "abyssal-crown",
+      "name": "Abyssal Crown",
+      "rarity": 5,
+      "exclusive": [
+        "mage"
+      ],
+      "fileId": "abyssal-crown"
+    },
+    {
+      "_id": "alexas-basket",
+      "name": "Alexa's Basket",
+      "rarity": 5,
+      "exclusive": [
+        "thief"
+      ],
+      "event": "",
+      "fileId": "alexas-basket"
+    }, { OTHER ARTIFACT OBJECTS* } ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:15:37 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}
+  </pre>
+						</div>
+						<em class="is-size-7">
+							*In this example, <strong class="has-text-info">results</strong> was trimmed to two artifacts for brevity
+						</em>
+					</div>
+
+					{{!-- make next examples with --}}
+					{{!-- div.is-hidden[data-code="example"]>(.message.has-description>pre.message-body) --}}
+					<div class="is-hidden" data-code="herodetail">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "abyssal-crown",
+      "name": "Abyssal Crown",
+      "rarity": 5,
+      "exclusive": [
+        "mage"
+      ],
+      "loreDescription": [
+        "May those ruled by the crown walk the road of corruption forever.",
+        "- Witch Reinwood, hung high up on the stake"
+      ],
+      "skillDescription": {
+        "base": "12.0% chance to stun the enemy for 1 turn after attacking.",
+        "max": "24.0% chance to stun the enemy for 1 turn after attacking."
+      },
+      "stats": {
+        "base": {
+          "atk": 15,
+          "hp": 54
+        },
+        "max": {
+          "atk": 195,
+          "hp": 702
+        }
+      },
+      "fileId": "abyssal-crown"
+    }
+  ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:17:07 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}</pre>
+						</div>
+					</div>
+
+				</div>
+
+
+
+
+
+                <h3 class="title is-4">
+                    How to use - Items
+                </h3>
+                <p>
+                    You can request the list of items with <strong class="has-text-info">/api/item</strong> and the details of a single artifact with <strong class="has-text-info">/api/item/_id</strong>, where <strong>_id</strong> can be either <strong>fileId</strong> or <strong>_id</strong> found in the artifact list. Example API response for both below:
+                </p>
+                <div class="tabs">
+					<ul>
+						<li class="is-active">
+							<a href="#" data-results="itemlist">
+								List
+							</a>
+						</li>
+						<li>
+							<a href="#" data-results="itemdetail">
+								Detail
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="codetabs">
+					<div data-code="itemlist">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "ancient-coin",
+      "name": "Ancient Coin",
+      "type": "currency",
+      "rarity": 3,
+      "description": "Ancient coinage found in Labyrinth. Can be traded for special items.",
+      "locations": [
+
+      ],
+      "fileId": "ancient-coin"
+    },
+    {
+      "_id": "ancient-creature-nucleus",
+      "name": "Ancient Creature Nucleus",
+      "type": "catalyst",
+      "rarity": 5,
+      "description": "A nucleus with an unknown source of power, some say it can be used to move anything in the world.",
+      "apShops": [
+        {
+          "chapter": "Chapter 7",
+          "quantity": 2,
+          "cost": 400
+        }
+      ],
+      "locations": [
+        {
+          "node": "World 7-S6",
+          "name": "Seven Flags Fortress",
+          "mobcount": "?"
+        }
+      ],
+      "fileId": "ancient-creature-nucleus"
+    }, { OTHER ITEM OBJECTS* } ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:15:37 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}
+  </pre>
+						</div>
+						<em class="is-size-7">
+							*In this example, <strong class="has-text-info">results</strong> was trimmed to two items for brevity
+                            <br>
+                            <strong class="has-text-info">apShops</strong> is currently optional, that is, might or might not come. Soon it'll come to all items, like locations.
+						</em>
+					</div>
+
+					{{!-- make next examples with --}}
+					{{!-- div.is-hidden[data-code="example"]>(.message.has-description>pre.message-body) --}}
+					<div class="is-hidden" data-code="itemdetail">
+						<div class="message has-description">
+							<pre class="message-body">{
+  "results": [
+    {
+      "_id": "mysterious-flash",
+      "name": "Mysterious Flash",
+      "type": "catalyst",
+      "rarity": 3,
+      "description": "At a glimpse it looks like a fragment containing the power of a spirit, but upon closer inspection you feel an unknown power.",
+      "apShops": [
+        {
+          "chapter": "Chapter 2",
+          "quantity": 5,
+          "cost": 120
+        },
+        {
+          "chapter": "Chapter 5S",
+          "quantity": 5,
+          "cost": 120
+        }
+      ],
+      "locations": [
+        {
+          "node": "Normal 2-1",
+          "name": "Grey Cliff Forest",
+          "mobcount": 7
+        },
+        {
+          "node": "World 2-1",
+          "name": "Grey Cliff Forest",
+          "mobcount": 7
+        },
+        {
+          "node": "World 5S-3",
+          "name": "?",
+          "mobcount": "?"
+        },
+        {
+          "node": "World 9-6",
+          "name": "Fallen Shelter",
+          "mobcount": 7
+        }
+      ],
+      "fileId": "mysterious-flash"
+    }
+  ],
+  "meta": {
+    "requestDate": "Fri Jun 07 18:28:36 UTC 2019",
+    "apiVersion": "0.4.0"
+  }
+}</pre>
+						</div>
+					</div>
+
+				</div>
+
+
+
             </main>
         </div>
     </div>
