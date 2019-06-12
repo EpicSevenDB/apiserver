@@ -1,6 +1,6 @@
 {
 	"name": "epicsevendb-apiserver",
-	"version": "0.5.3",
+	"version": "0.5.4",
 	"description": "EpicSevenDB.com API Server",
 	"main": "dist/server/Application.js",
 	"engines": {
@@ -39,6 +39,7 @@
 	"homepage": "https://github.com/EpicSevenDB/apiserver#readme",
 	"dependencies": {
 		"body-parser": "^1.18.3",
+		"connect-timeout": "^1.9.0",
 		"cors": "^2.8.5",
 		"dateformat": "^3.0.3",
 		"dep-linker": "^1.0.24",
