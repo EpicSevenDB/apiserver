@@ -62,3 +62,7 @@ export const getResponseMeta = () => {
 export const cLog = (logLevel = 'log', ...messages) => {
 	return console[logLevel](MESSAGES.apiLoggerPrefix, ...messages); // eslint-disable-line no-console
 };
+
+export function haltOnTimedout(req, res, next) {
+	if (!req.timedout) next();
+}

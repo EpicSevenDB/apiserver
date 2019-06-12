@@ -1,4 +1,5 @@
 import express from 'express';
+import timeout from 'connect-timeout';
 import Database from './Database';
 import { asyncRoute, mountApiErrorResponse, mountApiResponse } from '../utils/Utility';
 import { MESSAGES } from '../utils/Constants';
@@ -10,6 +11,7 @@ const router = express.Router();
 //------------------------ */
 router.get(
 	'/latest',
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('latest');
 
@@ -74,6 +76,7 @@ router.get(
 //------------------------ */
 router.get(
 	'/item/:fileId',
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('item'),
 			{ fileId } = req.params;
@@ -94,6 +97,7 @@ router.get(
 
 router.get(
 	'/item',
+	timeout('15s'),
 	// `:variable`, `:optionalvariable?`
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('item');
@@ -121,6 +125,7 @@ router.get(
 //------------------------ */
 router.get(
 	'/artifact/:fileId',
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('artifact'),
 			{ fileId } = req.params;
@@ -141,6 +146,7 @@ router.get(
 router.get(
 	'/artifact',
 	// `:variable`, `:optionalvariable?`
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('artifact');
 
@@ -169,6 +175,7 @@ router.get(
 //------------------------ */
 router.get(
 	'/hero/:_id',
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('hero'),
 			{ _id } = req.params;
@@ -303,6 +310,7 @@ router.get(
 router.get(
 	'/hero',
 	// `:variable`, `:optionalvariable?`
+	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
 		const collection = Database.getCollection('hero');
 

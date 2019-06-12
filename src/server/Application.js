@@ -1,5 +1,6 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import timeout from 'connect-timeout';
 import paths from './utils/Paths';
 import Router from './components/Router';
 import Server from './components/Server';
@@ -97,6 +98,7 @@ app.use('/ui', express.static(`${paths.dist}/ui/`));
 
 app.get(
 	'/',
+	timeout('5s'),
 	asyncRoute(async (req, res) => {
 		//this tells hbs view engine we want it to use views/layout as a layout
 		//so the filename you pass in render actually renders layout and the file
@@ -112,6 +114,7 @@ app.get(
 //------------------------ */
 //500
 app.use(
+	timeout('5s'),
 	asyncErrorRoute(async (err, req, res, next) => {
 		if (!next) res();
 		return res
@@ -129,6 +132,7 @@ app.use(
 
 //404
 app.use(
+	timeout('5s'),
 	asyncRoute(async (req, res) => {
 		return res
 			.status(404)
