@@ -86,6 +86,14 @@ const limiter = rateLimit({
 			`WARN: Too many requests to the API coming from IP ${req.ip}. If this message continues for this IP, might be a DDOS attack.`
 		);
 	},
+	skip: function(req, res) {
+		const authKeyHeader = req.headers && req.headers[HEADERS.authentication.key];
+
+		if (!authKeyHeader || (HEADERS.authentication.value && authKeyHeader !== HEADERS.authentication.value)) {
+			return false;
+		}
+		return true;
+	},
 });
 
 app.use('/api', limiter);

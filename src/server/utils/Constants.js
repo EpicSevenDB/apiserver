@@ -15,6 +15,7 @@ export const DB = {
 // Section: Request Headers Related
 //------------------------ */
 export const HEADERS = {
+	authentication: { key: 'x-e7db-auth-key', value: process.env.E7DB_AUTH_KEY || undefined },
 	html: {
 		'Content-Type': 'text/html',
 	},
