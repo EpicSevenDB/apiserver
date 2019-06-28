@@ -1,6 +1,6 @@
 {
 	"name": "epicsevendb-apiserver",
-	"version": "0.5.4",
+	"version": "0.5.5",
 	"description": "EpicSevenDB.com API Server",
 	"main": "dist/server/Application.js",
 	"engines": {

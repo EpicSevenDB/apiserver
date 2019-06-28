@@ -184,55 +184,82 @@ router.get(
 			return mountApiErrorResponse(res, MESSAGES.query.invalid);
 		}
 
-		// let queryCursor = collection.aggregate([
-		// 	{ $match: { _id } },
-		//     // populate relations
-		// 	{
-		// 		$lookup: {
-		// 			from: 'hero',
-		// 			let: { letId: '$relations.hero' },
-		// 			// localField: "relations.hero", //this would bring entire hero data, which is unnecesary
-		// 			// foreignField: "_id",  //this would bring entire hero data, which is unnecesary
-		// 			pipeline: [
-		// 				//match each $relations.hero (as "$$letId") in collection hero's (as "from") $_id
-		//                 { $match: { $expr: { $in: ['$_id', '$$letId'] } } },
-		//                 { $project: { name: 1, fileId: 1, _id: 1 } },
-		//                 // {$sort:{name:1}},
-		// 			],
-		// 			as: 'relations',
-		// 		},
-		//     },
+		let queryCursor = collection.aggregate([
+			{ $match: { _id } },
+			//     // populate relations BROKEN!!
+			// 	{
+			// 		$lookup: {
+			// 			from: 'hero',
+			// 			let: { letId: '$relations.hero' },
+			// 			// localField: "relations.hero", //this would bring entire hero data, which is unnecesary
+			// 			// foreignField: "_id",  //this would bring entire hero data, which is unnecesary
+			// 			pipeline: [
+			// 				//match each $relations.hero (as "$$letId") in collection hero's (as "from") $_id
+			//                 { $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+			//                 { $project: { name: 1, fileId: 1, _id: 1 } },
+			//                 // {$sort:{name:1}},
+			// 			],
+			// 			as: 'relations',
+			// 		},
+			//     },
 
-		// 	//populate specialtyChangeName
-		// 	{
-		// 		$lookup: {
-		// 			from: 'hero',
-		// 			let: { letId: ['$specialtyChangeName'] }, //fake letId into array
-		// 			// localField: "relations.hero",
-		// 			// foreignField: "_id",
-		// 			pipeline: [
-		// 				{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
-		// 				{ $project: { name: 1, fileId: 1, _id: 1 } },
-		// 			],
-		// 			as: 'specialtyChangeName',
-		// 		},
-		// 	},
-		// 	//make specialtyChangeName from array into object with the projected data
-		// 	{
-		// 		$unwind: {
-		// 			path: '$specialtyChangeName',
-		// 			//just don't unwind if doesn't exist, if false, it'll not return a hero document
-		// 			preserveNullAndEmptyArrays: true,
-		// 		},
-		// 	},
-		// ]);
+			// SPECIALTY CHANGE NAME
+			//populate specialtyChangeName
+			{
+				$lookup: {
+					from: 'hero',
+					let: { letId: ['$specialtyChangeName'] }, //fake letId into array
+					// localField: "relations.hero",
+					// foreignField: "_id",
+					pipeline: [
+						{ $match: { $expr: { $in: ['$_id', '$$letId'] } } },
+						{ $project: { name: 1, fileId: 1, _id: 1 } },
+					],
+					as: 'specialtyChangeName',
+				},
+			},
+			//make specialtyChangeName from array into object with the projected data
+			{
+				$unwind: {
+					path: '$specialtyChangeName',
+					//just don't unwind if doesn't exist, if false, it'll not return a hero document
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+
+			// VOICE ARRAY
+			{
+				$lookup: {
+					from: 'voice',
+					localField: '_id',
+					foreignField: '_id',
+					as: 'voice',
+				},
+			},
+			{
+				$addFields: {
+					voiceList: '$voice.voice',
+				},
+			},
+			{
+				$unwind: {
+					path: '$voiceList',
+					//just don't unwind if doesn't exist, if false, it'll not return a hero document
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+			{
+				$project: {
+					voice: 0,
+				},
+			},
+		]);
 
 		// return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
 
 		//LE OLD WAY, 3 calls, but faster... lol
-
 		//get hero
-		let queryCursor = collection.find({ _id }).limit(1);
+		// let queryCursor = collection.find({ _id }).limit(1);
 
 		return await queryCursor
 			.toArray()
@@ -275,27 +302,29 @@ router.get(
 							currentHero.relations = [];
 						}
 
+						//SPECIALTY CHANGE TAKEN CARE OF IN AGGREGATE ABOVE
+
 						//no specialty, end
-						if (!currentHero.specialtyChangeName) {
-							return mountApiResponse({}, res, null, [currentHero]);
-						}
+						// if (!currentHero.specialtyChangeName) {
+						return mountApiResponse({}, res, null, [currentHero]);
+						// // }
 
-						let queryCursorForSpecialty = collection
-							.find({ fileId: currentHero.specialtyChangeName })
-							.project({ _id: 1, name: 1 })
-							.limit(1);
+						// let queryCursorForSpecialty = collection
+						// 	.find({ fileId: currentHero.specialtyChangeName })
+						// 	.project({ _id: 1, name: 1 })
+						// 	.limit(1);
 
-						return await queryCursorForSpecialty.toArray().then((specialtyHeros) => {
-							if (!specialtyHeros || !specialtyHeros.length) {
-								return mountApiResponse({}, res, null, [currentHero]);
-							}
-							currentHero.specialtyChangeName = {
-								_id: specialtyHeros[0]._id,
-								fileId: currentHero.specialtyChangeName,
-								name: specialtyHeros[0].name,
-							};
-							return mountApiResponse({}, res, null, [currentHero]);
-						});
+						// return await queryCursorForSpecialty.toArray().then((specialtyHeros) => {
+						// 	if (!specialtyHeros || !specialtyHeros.length) {
+						// 		return mountApiResponse({}, res, null, [currentHero]);
+						// 	}
+						// 	currentHero.specialtyChangeName = {
+						// 		_id: specialtyHeros[0]._id,
+						// 		fileId: currentHero.specialtyChangeName,
+						// 		name: specialtyHeros[0].name,
+						// 	};
+						// 	return mountApiResponse({}, res, null, [currentHero]);
+						// });
 					});
 				} else {
 					return new Promise.reject();
