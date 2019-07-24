@@ -1,7 +1,7 @@
 import express from 'express';
 import timeout from 'connect-timeout';
 import Database from './Database';
-import { asyncRoute, mountApiErrorResponse, mountApiResponse } from '../utils/Utility';
+import { asyncRoute, mountApiErrorResponse, mountApiResponse, shuffleArray } from '../utils/Utility';
 import { MESSAGES } from '../utils/Constants';
 
 const router = express.Router();
@@ -400,6 +400,37 @@ router.get(
 						hero.debuffs = [].concat(...hero.debuffs);
 					});
 					return mountApiResponse({}, res, null, heroList);
+				} else {
+					return new Promise.reject();
+				}
+			})
+			.catch(() => {
+				return mountApiErrorResponse(res, MESSAGES.query.invalid);
+			});
+	})
+);
+
+//* ------------------------
+// Creators
+//------------------------ */
+router.get(
+	'/creator',
+	timeout('15s'),
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('creator');
+
+		if (!collection) {
+			return mountApiErrorResponse(res, MESSAGES.query.invalid);
+		}
+
+		let queryCursor = collection.find();
+
+		return await queryCursor
+			.toArray()
+			.then((creatorList = []) => {
+				if (creatorList.length) {
+					//random creator order each call
+					return mountApiResponse({}, res, null, shuffleArray(creatorList));
 				} else {
 					return new Promise.reject();
 				}
