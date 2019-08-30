@@ -359,6 +359,7 @@ router.get(
 						classType: 1,
 						zodiac: 1,
 						skills: 1,
+						memoryImprintAttribute: 1,
 					},
 				},
 				{
