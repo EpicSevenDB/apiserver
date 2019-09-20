@@ -75,6 +75,55 @@ router.get(
 // Items
 //------------------------ */
 router.get(
+	'/ex_equip/:fileId',
+	timeout('15s'),
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('ex_equip'),
+			{ fileId } = req.params;
+
+		if (!collection || !fileId) {
+			return mountApiErrorResponse(res, MESSAGES.query.invalid);
+		}
+
+		let queryCursor = collection
+			.find({
+				fileId,
+			})
+			.limit(1);
+
+		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+	})
+);
+
+router.get(
+	'/ex_equip',
+	timeout('15s'),
+	// `:variable`, `:optionalvariable?`
+	asyncRoute(async (req, res, next) => {
+		const collection = Database.getCollection('ex_equip');
+
+		if (!collection) {
+			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
+		}
+
+		// req.params.results resource/{number}
+		// req.query.results resource?results={number}
+
+		let queryCursor = collection
+			.find()
+			// https://docs.mongodb.com/manual/reference/method/cursor.sort/index.html#sort-asc-desc
+			.sort({
+				_id: 1,
+			});
+
+		return await queryCursor.toArray((...args) => mountApiResponse(queryCursor, res, ...args));
+	})
+);
+
+//* ------------------------
+// Items
+//------------------------ */
+router.get(
 	'/item/:fileId',
 	timeout('15s'),
 	asyncRoute(async (req, res, next) => {
@@ -251,6 +300,16 @@ router.get(
 			{
 				$project: {
 					voice: 0,
+				},
+			},
+
+			// EX_EQUIP ARRAY
+			{
+				$lookup: {
+					from: 'ex_equip',
+					localField: '_id',
+					foreignField: 'heroId',
+					as: 'ex_equip',
 				},
 			},
 		]);
