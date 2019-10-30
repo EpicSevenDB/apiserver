@@ -44,6 +44,13 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 //* ------------------------
 // Section: Database Related
 //------------------------ */
+export const getCurrentLanguage = (req) => {
+	let { lang: requestedLanguage = req.get('x-e7db-lang') } = req.query;
+	if (!['en', 'es', 'pt'].includes(requestedLanguage)) {
+		return requestedLanguage;
+	}
+	return 'en';
+};
 
 //* ------------------------
 // Section:General Utility Related

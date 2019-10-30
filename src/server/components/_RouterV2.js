@@ -1,10 +1,22 @@
 import express from 'express';
 import timeout from 'connect-timeout';
 import Database from './Database';
-import { asyncRoute, mountApiErrorResponse, mountApiResponse, shuffleArray } from '../utils/Utility';
+import {
+	asyncRoute,
+	mountApiErrorResponse,
+	mountApiResponse,
+	shuffleArray,
+	getCurrentLanguage,
+} from '../utils/Utility';
 import { MESSAGES } from '../utils/Constants';
 
 const router = express.Router();
+
+// log requests
+router.use(function(req, res, next) {
+	cLog('log', `${getDateNow()} :: ${req.ip} REQ: ${req.originalUrl} || REF: ${req.get('Referrer')}`);
+	next();
+});
 
 router.get(
 	'/artifactjs',
@@ -13,13 +25,7 @@ router.get(
 		const TIME_START = process.hrtime();
 
 		try {
-			const { lang: requestedLanguage = 'en' } = req.query;
-
-			// TODO create lang checker method
-			if (!['en', 'es', 'pt'].includes(requestedLanguage)) {
-				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
-			}
-
+			const requestedLanguage = getCurrentLanguage(req);
 			const translation = Database.getCollection(`text_${requestedLanguage}`);
 			const collection = Database.getCollection('artifact');
 
@@ -67,28 +73,22 @@ router.get(
 		const TIME_START = process.hrtime();
 
 		try {
-			const { lang: requestedLanguage = 'en' } = req.query;
-
-			// TODO create lang checker method
-			if (!['en', 'es', 'pt'].includes(requestedLanguage)) {
-				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
-			}
-
-			const translation = Database.getCollection(`text_${requestedLanguage}`);
+			const requestedLanguage = getCurrentLanguage(req);
+			const translationCollection = `text_${requestedLanguage}`;
 			const collection = Database.getCollection('artifact');
 
 			if (!collection || !translation) {
 				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 			}
 
-			let artifactList = await collection
+			return await collection
 				.aggregate([
 					{
 						$project: { name: 1, rarity: 1, role: 1 },
 					},
 					{
 						$lookup: {
-							from: 'text_en',
+							from: translationCollection,
 							localField: 'name',
 							foreignField: '_id',
 							as: 'name',
@@ -106,13 +106,12 @@ router.get(
 				.sort({
 					rarity: -1,
 					name: 1,
+				})
+				.toArray((...args) => {
+					const TIME_END = process.hrtime(TIME_START);
+					console.info('Execution time (hr): %ds %dms', TIME_END[0], TIME_END[1] / 1000000);
+					mountApiResponse(artifactList, res, ...args);
 				});
-
-			return await artifactList.toArray((...args) => {
-				const TIME_END = process.hrtime(TIME_START);
-				console.info('Execution time (hr): %ds %dms', TIME_END[0], TIME_END[1] / 1000000);
-				mountApiResponse(artifactList, res, ...args);
-			});
 		} catch (error) {
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
