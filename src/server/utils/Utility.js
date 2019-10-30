@@ -45,11 +45,11 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 // Section: Database Related
 //------------------------ */
 export const getCurrentLanguage = (req) => {
-	let { lang: requestedLanguage = req.get('x-e7db-lang') } = req.query;
-	if (!['en', 'es', 'pt'].includes(requestedLanguage)) {
-		return requestedLanguage;
+	let { lang: requestedLanguage = req.get('x-e7db-lang') || 'en' } = req.query;
+	if (requestedLanguage === 'en' || !['en', 'es', 'pt', 'kr'].includes(requestedLanguage)) {
+		return 'en';
 	}
-	return 'en';
+	return requestedLanguage;
 };
 
 //* ------------------------
@@ -81,4 +81,17 @@ export function shuffleArray(array) {
 		[a[i], a[j]] = [a[j], a[i]];
 	}
 	return a;
+}
+
+// https://stackoverflow.com/a/39514270
+export function assignDefined(target, ...sources) {
+	for (const source of sources) {
+		for (const key of Object.keys(source)) {
+			const val = source[key];
+			if (val !== undefined || val !== '' || val !== null) {
+				target[key] = val;
+			}
+		}
+	}
+	return target;
 }

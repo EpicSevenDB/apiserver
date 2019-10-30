@@ -6,6 +6,9 @@ import {
 	mountApiErrorResponse,
 	mountApiResponse,
 	shuffleArray,
+	cLog,
+	getDateNow,
+	assignDefined,
 	getCurrentLanguage,
 } from '../utils/Utility';
 import { MESSAGES } from '../utils/Constants';
@@ -26,10 +29,14 @@ router.get(
 
 		try {
 			const requestedLanguage = getCurrentLanguage(req);
-			const translation = Database.getCollection(`text_${requestedLanguage}`);
+			const translationEnglish = Database.getCollection(`text_en`);
+			let translationOther;
+			if (requestedLanguage !== 'en') {
+				translationOther = Database.getCollection(`text_${requestedLanguage}`);
+			}
 			const collection = Database.getCollection('artifact');
 
-			if (!collection || !translation) {
+			if (!collection || !translationEnglish) {
 				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 			}
 
@@ -50,17 +57,30 @@ router.get(
 				return keyArray;
 			}, []);
 
-			let artifactTranslation = await translation.find({ _id: { $in: translationKeys } }).toArray();
+			let artifactTranslationEngObj = {};
+			let artifactTranslationOtherObj = {};
 
-			artifactList.map((artifact) => {
-				const realKey = artifactTranslation.find((translationKey) => translationKey._id === artifact.name);
-				artifact.name = (realKey && realKey.text) || artifact.name;
+			await translationEnglish
+				.find({ _id: { $in: translationKeys } })
+				.forEach((translation) => (artifactTranslationEngObj[translation._id] = translation.text));
+			if (translationOther) {
+				await translationOther
+					.find({ _id: { $in: translationKeys } })
+					.forEach((translation) => (artifactTranslationOtherObj[translation._id] = translation.text));
+			}
+
+			let finalTranslations = assignDefined({}, artifactTranslationEngObj, artifactTranslationOtherObj);
+
+			artifactList.forEach((artifact) => {
+				const realKey = finalTranslations[artifact.name];
+				artifact.name = realKey || artifact.name;
 			});
 
 			const TIME_END = process.hrtime(TIME_START);
 			console.info('Execution time (hr): %ds %dms', TIME_END[0], TIME_END[1] / 1000000);
 			return mountApiResponse({}, res, null, artifactList);
 		} catch (error) {
+			console.error(error.stack);
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 	})
@@ -77,11 +97,11 @@ router.get(
 			const translationCollection = `text_${requestedLanguage}`;
 			const collection = Database.getCollection('artifact');
 
-			if (!collection || !translation) {
+			if (!collection || !translationCollection) {
 				return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 			}
 
-			return await collection
+			let artifactList = await collection
 				.aggregate([
 					{
 						$project: { name: 1, rarity: 1, role: 1 },
@@ -113,6 +133,7 @@ router.get(
 					mountApiResponse(artifactList, res, ...args);
 				});
 		} catch (error) {
+			console.error(error.stack);
 			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 		}
 	})

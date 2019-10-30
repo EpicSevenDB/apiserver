@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import timeout from 'connect-timeout';
 import paths from './utils/Paths';
 import Router from './components/Router';
-// import RouterV2 from './components/_RouterV2';
+import RouterV2 from './components/_RouterV2';
 import Server from './components/Server';
 import Database from './components/Database';
 import { asyncRoute, asyncErrorRoute, cLog, mountApiErrorResponse } from './utils/Utility';
@@ -99,7 +99,7 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 app.use('/api', Router);
-// app.use('/api/v2', RouterV2);
+app.use('/api/v2', RouterV2);
 
 //* ------------------------
 // Static Routes
