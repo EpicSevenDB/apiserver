@@ -46,7 +46,7 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 //------------------------ */
 export const getCurrentLanguage = (req) => {
 	let { lang: requestedLanguage = req.get('x-e7db-lang') } = req.query;
-	if (!['en', 'es', 'pt'].includes(requestedLanguage)) {
+	if (['en', 'kr'].includes(requestedLanguage)) {
 		return requestedLanguage;
 	}
 	return 'en';
@@ -81,4 +81,15 @@ export function shuffleArray(array) {
 		[a[i], a[j]] = [a[j], a[i]];
 	}
 	return a;
+}
+
+export function nodeTimer(startedAt) {
+	if (process.env.NODE_ENV === 'production') {
+		return;
+	}
+	if (!startedAt) {
+		return process.hrtime();
+	}
+	const TIME_END = process.hrtime(startedAt);
+	console.info('Execution time (hr): %ds %dms', TIME_END[0], TIME_END[1] / 1000000);
 }

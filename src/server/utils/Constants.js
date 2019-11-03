@@ -11,6 +11,11 @@ export const DB = {
 	url: process.env.MONGOLAB_URI || '',
 };
 
+export const DB2 = {
+	name: process.env.E7DB_ATLAS_DB || '',
+	url: process.env.E7DB_ATLAS_URI || '',
+};
+
 //* ------------------------
 // Section: Request Headers Related
 //------------------------ */
