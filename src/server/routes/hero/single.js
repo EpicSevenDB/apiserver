@@ -24,7 +24,6 @@ export default asyncRoute(async (req, res, next) => {
 		const heroDetail = await collection
 			.aggregate([
 				{ $match: { _id } },
-				{ $limit: 1 },
 				{
 					$lookup: {
 						from: translationCollection,
@@ -158,10 +157,7 @@ export default asyncRoute(async (req, res, next) => {
 					$lookup: {
 						from: translationCollection,
 						let: { pid: '$camping.topics' },
-						pipeline: [
-							{ $match: { $expr: { $in: ['$_id', '$$pid'] } } },
-							// Add additional stages here
-						],
+						pipeline: [{ $match: { $expr: { $in: ['$_id', '$$pid'] } } }],
 						as: 'camping.topics',
 					},
 				},
@@ -174,33 +170,136 @@ export default asyncRoute(async (req, res, next) => {
 					$lookup: {
 						from: translationCollection,
 						let: { pid: '$camping.personalities' },
-						pipeline: [
-							{ $match: { $expr: { $in: ['$_id', '$$pid'] } } },
-							// Add additional stages here
-						],
+						pipeline: [{ $match: { $expr: { $in: ['$_id', '$$pid'] } } }],
 						as: 'camping.personalities',
 					},
 				},
 				{
 					$addFields: {
 						camping: { personalities: '$camping.personalities.text' },
+					},
+				},
+				{
+					$unwind: '$skills',
+				},
+				{
+					$lookup: {
+						from: translationCollection,
+						localField: 'skills.description',
+						foreignField: '_id',
+						as: 'skills.description',
+					},
+				},
+				{
+					$unwind: '$skills.description',
+				},
+				{
+					$addFields: {
+						skills: { description: '$skills.description.text' },
 					},
 				},
 				{
 					$lookup: {
 						from: translationCollection,
-						let: { pid: '$camping.values' },
-						pipeline: [
-							{ $match: { $expr: { $in: ['$_id', '$$pid'] } } },
-							// Add additional stages here
-						],
-						as: 'camping.personalities',
+						localField: 'skills.enhanced_description',
+						foreignField: '_id',
+						as: 'skills.enhanced_description',
+					},
+				},
+				{
+					$unwind: {
+						path: '$skills.enhanced_description',
+						preserveNullAndEmptyArrays: true,
 					},
 				},
 				{
 					$addFields: {
-						camping: { personalities: '$camping.personalities.text' },
+						skills: {
+							enhanced_description: {
+								$ifNull: ['$skills.enhanced_description.text', null],
+							},
+						},
 					},
+				},
+				{
+					$lookup: {
+						from: translationCollection,
+						localField: 'skills.soul_description',
+						foreignField: '_id',
+						as: 'skills.soul_description',
+					},
+				},
+				{
+					$unwind: {
+						path: '$skills.soul_description',
+						preserveNullAndEmptyArrays: true,
+					},
+				},
+				{
+					$addFields: {
+						skills: {
+							soul_description: {
+								$ifNull: ['$skills.soul_description.text', null],
+							},
+						},
+					},
+				},
+				{
+					$lookup: {
+						from: translationCollection,
+						localField: 'skills.name',
+						foreignField: '_id',
+						as: 'skills.name',
+					},
+				},
+				{
+					$unwind: '$skills.name',
+				},
+				{
+					$addFields: {
+						skills: { name: '$skills.name.text' },
+					},
+				},
+				{
+					$lookup: {
+						from: translationCollection,
+						let: { pid: '$skills.enhancements' },
+						pipeline: [{ $match: { $expr: { $in: ['$_id', '$$pid'] } } }],
+						as: 'skills.enhancements',
+					},
+				},
+				{
+					$addFields: {
+						skills: { enhancements: '$skills.enhancements.text' },
+					},
+				},
+				// {
+				//     $group: {
+				//         _id: "$_id",
+				//         myHero: { "$first": "$$ROOT" },
+				//     }
+				// },
+				// {
+				//     "$replaceRoot": { "newRoot": "$myHero" }
+				//   }
+				{
+					$group: {
+						_id: '$_id',
+						myHero: { $first: '$$ROOT' },
+						skills: {
+							$push: '$skills',
+						},
+					},
+				},
+				{
+					$addFields: {
+						myHero: {
+							skills: '$skills',
+						},
+					},
+				},
+				{
+					$replaceRoot: { newRoot: '$myHero' },
 				},
 			])
 			.toArray();
@@ -211,6 +310,7 @@ export default asyncRoute(async (req, res, next) => {
 		}
 		return mountApiErrorResponse(res, MESSAGES.query.invalid);
 	} catch (error) {
+		console.error(JSON.stringify(error, null, 4));
 		return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
 	}
 });
