@@ -273,15 +273,6 @@ export default asyncRoute(async (req, res, next) => {
 						skills: { enhancements: '$skills.enhancements.text' },
 					},
 				},
-				// {
-				//     $group: {
-				//         _id: "$_id",
-				//         myHero: { "$first": "$$ROOT" },
-				//     }
-				// },
-				// {
-				//     "$replaceRoot": { "newRoot": "$myHero" }
-				//   }
 				{
 					$group: {
 						_id: '$_id',
@@ -301,6 +292,15 @@ export default asyncRoute(async (req, res, next) => {
 				{
 					$replaceRoot: { newRoot: '$myHero' },
 				},
+				// {
+				//     $group: {
+				//         _id: "$_id",
+				//         myHero: { "$first": "$$ROOT" },
+				//     }
+				// },
+				// {
+				//     "$replaceRoot": { "newRoot": "$myHero" }
+				//   }
 			])
 			.toArray();
 
