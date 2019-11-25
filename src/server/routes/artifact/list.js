@@ -23,7 +23,7 @@ export default asyncRoute(async (req, res, next) => {
 		const artifactList = await collection
 			.aggregate([
 				{
-					$project: { _id: 1, name: 1, rarity: 1, role: 1 },
+					$project: { _id: 1, identifier: 1, name: 1, rarity: 1, role: 1, assets: 1 },
 				},
 				{
 					$lookup: {
