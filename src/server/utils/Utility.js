@@ -45,17 +45,25 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 // Section: Database Related
 //------------------------ */
 export const getCurrentLanguage = (req) => {
-	let { lang: requestedLanguage = req.get('x-e7db-lang') } = req.query;
-	if (['en', 'de', 'es', 'fr', 'pt', 'ko', 'cn'].includes(requestedLanguage)) {
-		// site iso is KO, not KR, but collection is KR
-		if (requestedLanguage === 'ko') {
-			return 'kr';
-		}
-		// site iso is CN, not zht, but collection is zht
-		if (requestedLanguage === 'cn') {
-			return 'zht';
-		}
-		return requestedLanguage;
+	let { lang: requestedLanguage = req.get('x-e7db-lang') || 'en' } = req.query;
+	if (
+		requestedLanguage === 'en' ||
+		!['es', 'pt', 'fr', 'ja', 'jp', 'kr', 'ko', 'de', 'zht', 'cn'].includes(requestedLanguage)
+	) {
+		return 'en';
+	}
+	switch (requestedLanguage) {
+		case 'cn':
+			requestedLanguage = 'zht';
+			break;
+		case 'ko':
+			requestedLanguage = 'kr';
+			break;
+		case 'jp':
+			requestedLanguage = 'ja';
+			break;
+		default:
+			break;
 	}
 	return requestedLanguage;
 };
