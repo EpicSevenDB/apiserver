@@ -45,9 +45,17 @@ export const mountApiResponse = (queryCursor, res, err, dbResults = []) => {
 // Section: Database Related
 //------------------------ */
 export const getCurrentLanguage = (req) => {
-	let { lang: requestedLanguage = req.get('x-e7db-lang') || 'en' } = req.query;
-	if (requestedLanguage === 'en' || !['en', 'es', 'pt', 'kr'].includes(requestedLanguage)) {
-		return 'en';
+	let { lang: requestedLanguage = req.get('x-e7db-lang') } = req.query;
+	if (['en', 'de', 'es', 'fr', 'pt', 'ko', 'cn'].includes(requestedLanguage)) {
+		// site iso is KO, not KR, but collection is KR
+		if (requestedLanguage === 'ko') {
+			return 'kr';
+		}
+		// site iso is CN, not zht, but collection is zht
+		if (requestedLanguage === 'cn') {
+			return 'zht';
+		}
+		return requestedLanguage;
 	}
 	return requestedLanguage;
 };
@@ -94,4 +102,15 @@ export function assignDefined(target, ...sources) {
 		}
 	}
 	return target;
+}
+
+export function nodeTimer(startedAt) {
+	if (process.env.NODE_ENV === 'production') {
+		return;
+	}
+	if (!startedAt) {
+		return process.hrtime();
+	}
+	const TIME_END = process.hrtime(startedAt);
+	console.info('Execution time (hr): %ds %dms', TIME_END[0], TIME_END[1] / 1000000);
 }

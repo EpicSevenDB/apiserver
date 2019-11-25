@@ -99,6 +99,7 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 app.use('/api', Router);
+app.use('/api/v2', limiter);
 app.use('/api/v2', RouterV2);
 
 //* ------------------------
