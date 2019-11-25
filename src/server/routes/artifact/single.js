@@ -34,7 +34,7 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: '$name',
+					$unwind: { path: '$name', preserveNullAndEmptyArrays: true },
 				},
 				{
 					$addFields: {
@@ -50,7 +50,7 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: '$description',
+					$unwind: { path: '$description', preserveNullAndEmptyArrays: true },
 				},
 				{
 					$addFields: {
@@ -66,7 +66,7 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: '$skill.description',
+					$unwind: { path: '$skill.description', preserveNullAndEmptyArrays: true },
 				},
 				{
 					$addFields: {

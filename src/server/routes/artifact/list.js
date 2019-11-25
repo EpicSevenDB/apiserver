@@ -34,7 +34,7 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: '$name',
+					$unwind: { path: '$name', preserveNullAndEmptyArrays: true },
 				},
 				{
 					$addFields: {

@@ -103,7 +103,7 @@ class Database {
 		})
 			.then((client) => {
 				this.client = client;
-				this.db = this.client.db(tDB.name);
+				this.db = this.client.db(DB.name);
 			})
 			.catch((err = '') => {
 				throw new Error(err);
