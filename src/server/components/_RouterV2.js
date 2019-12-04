@@ -14,5 +14,9 @@ router.get('/artifact/:_id', timeout('15s'), Routes.artifactDetail);
 router.get('/artifact', timeout('15s'), Routes.artifactList);
 router.get('/hero/:_id', timeout('15s'), Routes.heroDetail);
 router.get('/hero', timeout('15s'), Routes.heroList);
+router.get('/item/:_id', timeout('15s'), Routes.itemDetail);
+router.get('/item', timeout('15s'), Routes.itemList);
+
+router.get('/ranking', timeout('15s'), Routes.arenaRanking);
 
 export default router;

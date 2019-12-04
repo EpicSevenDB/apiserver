@@ -44,19 +44,11 @@ class Database {
 	}
 
 	getCollection(collectionName, dbtype = 1) {
-		if (dbtype === 1) {
-			if (typeof this.db.collection !== 'function') {
-				return undefined;
-			}
-			return this.db.collection(collectionName);
+		const dbname = `db${dbtype}`;
+		if (typeof this[dbname].collection !== 'function') {
+			return undefined;
 		}
-
-		if (dbtype === 2) {
-			if (typeof this.db2.collection !== 'function') {
-				return undefined;
-			}
-			return this.db2.collection(collectionName);
-		}
+		return this[dbname].collection(collectionName);
 	}
 
 	//connecting

@@ -17,8 +17,8 @@ export default asyncRoute(async (req, res, next) => {
 		const translationCollection = `text_${requestedLanguage}`;
 		const collection = Database.getCollection('hero', 2);
 
-		if (!collection || !translationCollection || !_id) {
-			return mountApiErrorResponse(res, MESSAGES.db.dbConnectionQuery);
+		if (!collection || !requestedLanguage || !_id) {
+			throw new Error('!collection || !requestedLanguage || !_id');
 		}
 
 		const heroDetail = await collection
@@ -260,19 +260,27 @@ export default asyncRoute(async (req, res, next) => {
 						skills: { name: '$skills.name.text' },
 					},
 				},
-				{
-					$lookup: {
-						from: translationCollection,
-						let: { pid: '$skills.enhancements' },
-						pipeline: [{ $match: { $expr: { $in: ['$_id', '$$pid'] } } }],
-						as: 'skills.enhancements',
-					},
-				},
-				{
-					$addFields: {
-						skills: { enhancements: '$skills.enhancements.text' },
-					},
-				},
+				// {
+				// 	$lookup: {
+				// 		from: translationCollection,
+				// 		let: { pid: '$skills.enhancements' },
+				// 		pipeline: [{ $match: { $expr: { $in: ['$_id', '$$pid'] } } }],
+				// 		as: 'skills.enhancements',
+				// 	},
+				// },
+				// {
+				// 	$lookup: {
+				// 		from: translationCollection,
+				// 		localField: 'skills.enhancements.string',
+				// 		foreignField: '_id',
+				// 		as: 'skills.enhancements.string',
+				// 	},
+				// },
+				// {
+				// 	$addFields: {
+				// 		skills: { enhancements: {string:'$skills.enhancements.string.text'} },
+				// 	},
+				// },
 				{
 					$group: {
 						_id: '$_id',

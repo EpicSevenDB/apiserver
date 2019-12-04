@@ -14,23 +14,18 @@ export default asyncRoute(async (req, res, next) => {
 	try {
 		const requestedLanguage = getCurrentLanguage(req);
 		const translationCollection = `text_${requestedLanguage}`;
-		const collection = Database.getCollection('hero', 2);
+		const collection = Database.getCollection('item', 2);
 
 		if (!collection || !requestedLanguage) {
 			throw new Error('!collection || !requestedLanguage');
 		}
 
-		const heroList = await collection
+		const itemList = await collection
 			.aggregate([
 				{
 					$project: {
-						_id: 1,
-						name: 1,
-						rarity: 1,
-						attribute: 1,
-						role: 1,
-						zodiac: 1,
-						devotion: { type: 1 },
+						request_count: 0,
+						support_count: 0,
 					},
 				},
 				{
@@ -42,23 +37,64 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: '$name',
+					$unwind: {
+						path: '$name',
+						preserveNullAndEmptyArrays: true,
+					},
 				},
 				{
 					$addFields: {
 						name: '$name.text',
 					},
 				},
+				{
+					$lookup: {
+						from: translationCollection,
+						localField: 'description',
+						foreignField: '_id',
+						as: 'description',
+					},
+				},
+				{
+					$unwind: {
+						path: '$description',
+						preserveNullAndEmptyArrays: true,
+					},
+				},
+				{
+					$addFields: {
+						description: '$description.text',
+					},
+				},
+				{
+					$lookup: {
+						from: translationCollection,
+						localField: 'category',
+						foreignField: '_id',
+						as: 'category',
+					},
+				},
+				{
+					$unwind: {
+						path: '$category',
+						preserveNullAndEmptyArrays: true,
+					},
+				},
+				{
+					$addFields: {
+						category: '$category.text',
+					},
+				},
 			])
 			.sort({
-				rarity: -1,
-				_id: 1,
+				type1: 1,
+				type2: 1,
 			})
 			.toArray();
 
-		if (heroList && heroList.length) {
+		if (itemList && itemList.length) {
 			nodeTimer(TIME_START);
-			return mountApiResponse({}, res, null, heroList);
+			return mountApiResponse({}, res, null, itemList);
 		}
 		return mountApiErrorResponse(res, MESSAGES.query.invalid);
 	} catch (error) {

@@ -9,22 +9,28 @@ import {
 } from '../../utils/Utility';
 
 export default asyncRoute(async (req, res, next) => {
-	const TIME_START = nodeTimer();
+	const TIME_START = process.hrtime();
 	const { _id } = req.params;
 
 	try {
 		const requestedLanguage = getCurrentLanguage(req);
 		const translationCollection = `text_${requestedLanguage}`;
-		const collection = Database.getCollection('artifact', 2);
+		const collection = Database.getCollection('item', 2);
 
 		if (!collection || !requestedLanguage || !_id) {
+			console.log('hue');
 			throw new Error('!collection || !requestedLanguage || !_id');
 		}
 
-		const artifactDetail = await collection
+		const itemDetail = await collection
 			.aggregate([
 				{ $match: { _id } },
-				{ $limit: 1 },
+				{
+					$project: {
+						request_count: 0,
+						support_count: 0,
+					},
+				},
 				{
 					$lookup: {
 						from: translationCollection,
@@ -34,7 +40,10 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: { path: '$name', preserveNullAndEmptyArrays: true },
+					$unwind: {
+						path: '$name',
+						preserveNullAndEmptyArrays: true,
+					},
 				},
 				{
 					$addFields: {
@@ -50,7 +59,10 @@ export default asyncRoute(async (req, res, next) => {
 					},
 				},
 				{
-					$unwind: { path: '$description', preserveNullAndEmptyArrays: true },
+					$unwind: {
+						path: '$description',
+						preserveNullAndEmptyArrays: true,
+					},
 				},
 				{
 					$addFields: {
@@ -60,25 +72,28 @@ export default asyncRoute(async (req, res, next) => {
 				{
 					$lookup: {
 						from: translationCollection,
-						localField: 'skill.description',
+						localField: 'category',
 						foreignField: '_id',
-						as: 'skill.description',
+						as: 'category',
 					},
 				},
 				{
-					$unwind: { path: '$skill.description', preserveNullAndEmptyArrays: true },
+					$unwind: {
+						path: '$category',
+						preserveNullAndEmptyArrays: true,
+					},
 				},
 				{
 					$addFields: {
-						skill: { description: '$skill.description.text' },
+						category: '$category.text',
 					},
 				},
 			])
 			.toArray();
 
-		if (artifactDetail && artifactDetail.length) {
+		if (itemDetail && itemDetail.length) {
 			nodeTimer(TIME_START);
-			return mountApiResponse({}, res, null, artifactDetail);
+			return mountApiResponse({}, res, null, itemDetail);
 		}
 		return mountApiErrorResponse(res, MESSAGES.query.invalid);
 	} catch (error) {
