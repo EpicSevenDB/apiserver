@@ -8,9 +8,11 @@
     <br>
 
     <div class="notification is-warning">
-        <p><strong class="is-4">Domain Update:</strong></p>
+        <p><strong class="is-4">Domain Update Announcement (v1 -> v2):</strong></p>
         <p>
-            As of version <strong>0.7.0</strong> onwards, you can now the official E7DB domain: <strong>https://api.epicsevendb.com/api/</strong> for the API if you'd like. Documentation has been updated to reflect new Endpoint URL. Or keep using heroku's domain ( <em>https://epicsevendb-apiserver.herokuapp.com/api/</em> ), both will keep working :)
+            This documentation is for <strong>version 1.0.0</strong>, and will be kept up at <strong>https://epicsevendb-apiserver.herokuapp.com/api/</strong> until March 2020. The new <strong>version 2.0.0</strong> onwards will be hosted at <strong>https://api.epicsevendb.com/</strong>.
+            <br><br>
+            The v2 uses same endpoints, but without the redundant /api/, while utilizing game data and multi-language support, and it'll be released soon (Feb 2020). I'll try create a router on v2 that all calls to /api/ re-route to the heroku URL so it becomes seamless for those who still didn't upgrade, but v1 will not be updated anymore (probably until the next hero after Alencia).
         </p>
     </div>
 </div>

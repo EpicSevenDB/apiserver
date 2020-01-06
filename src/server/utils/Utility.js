@@ -79,6 +79,8 @@ export const getResponseMeta = () => {
 	return {
 		requestDate: getDateNow(),
 		apiVersion: VERSION,
+		IMPORTANT:
+			'Version 1.x.x will be kept at https://epicsevendb-apiserver.herokuapp.com/api/, and version 2.x.x (to be released in Feb 2020) will utilize the https://api.epicsevendb.com/ domain. Please see more details in the announcement @ https://epicsevendb-apiserver.herokuapp.com/ documentation homepage.',
 	};
 };
 
